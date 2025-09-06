@@ -4,10 +4,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class InstagueraApplication {
+public class Instaguera {
 
 	public static void main(String[] args) {
-		SpringApplication.run(InstagueraApplication.class, args);
+		SpringApplication.run(Instaguera.class, args);
 	}
-
 }
