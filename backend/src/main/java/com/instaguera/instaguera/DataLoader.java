@@ -5,6 +5,7 @@ import com.instaguera.instaguera.repository.TurnoRepository;
 import com.instaguera.instaguera.repository.UsuarioRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.time.OffsetDateTime;
 
@@ -22,24 +23,26 @@ public class DataLoader implements CommandLineRunner {
     @Override
     public void run(String... args) {
         if (usuarioRepository.count() == 0) {
-            // Crear dueño
+            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+
             Usuario dueno = new Usuario(
                     "Carlos",
                     "Gómez",
                     "1122334455",
                     "tattoo_master",
-                    "123456", // más adelante lo encriptaremos
-                    Role.DUENO
+                    encoder.encode("123456"), // 🔒 encriptada
+                    Role.DUENO,
+                    "devalen@gmail.com"
             );
 
-            // Crear cliente
             Usuario cliente = new Usuario(
                     "Juan",
                     "Pérez",
                     "1199887766",
                     "juanito",
-                    "123456",
-                    Role.CLIENTE
+                    encoder.encode("123456"), // 🔒 encriptada
+                    Role.CLIENTE,
+                    "devalen2@gmail.com"
             );
 
             usuarioRepository.save(dueno);

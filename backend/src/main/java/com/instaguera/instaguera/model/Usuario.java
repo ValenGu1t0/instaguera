@@ -28,6 +28,9 @@ public class Usuario {
     @Column(nullable = false)
     private Role role;
 
+    @Column(unique = true, nullable = false)
+    private String email;
+
     // Relación con turnos donde actúa como cliente
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Turno> turnosComoCliente = new ArrayList<>();
@@ -38,13 +41,14 @@ public class Usuario {
 
     public Usuario() {}
 
-    public Usuario(String nombre, String apellido, String celular, String username, String password, Role role) {
+    public Usuario(String nombre, String apellido, String celular, String username, String password, Role role, String email) {
         this.nombre = nombre;
         this.apellido = apellido;
         this.celular = celular;
         this.username = username;
         this.password = password;
         this.role = role;
+        this.email = email;
     }
 
     // Getters y setters
@@ -59,6 +63,8 @@ public class Usuario {
     public void setUsername(String username) { this.username = username; }
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
     public Role getRole() { return role; }
     public void setRole(Role role) { this.role = role; }
 }
