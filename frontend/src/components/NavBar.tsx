@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation"; 
 import { useAuthStore } from "@/store/auth";
 import { LogOut, User } from "lucide-react";
@@ -10,13 +10,32 @@ import { toast } from "sonner";
 
 export default function NavBar() {
   
+  const [mounted, setMounted] = useState(false);
   const [visible, setVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
 
   const router = useRouter();
-  const { token, logout } = useAuthStore();
+  const { token, user, logout } = useAuthStore();
 
-  const controlNavbar = () => {
+  let turnosHref = "/login";
+  let turnosLabel = "Turnos";
+
+  if (token) {
+    if (user?.role === "ADMIN"  || user?.role === "DUENO") {
+      turnosHref = "/admin/turnos";
+      turnosLabel = "Gestión";
+
+    } else if (user?.role === "CLIENTE") {
+      turnosHref = "/user";
+      turnosLabel = "Perfil";
+    }
+  }
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const controlNavbar = useCallback(() => {
     if (typeof window !== "undefined") {
       if (window.scrollY > lastScrollY) {
         setVisible(false);
@@ -25,7 +44,7 @@ export default function NavBar() {
       }
       setLastScrollY(window.scrollY);
     }
-  };
+  }, [lastScrollY]);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -34,13 +53,17 @@ export default function NavBar() {
         window.removeEventListener("scroll", controlNavbar);
       };
     }
-  }, [lastScrollY]);
+  }, [controlNavbar]); 
 
   const handleLogout = () => {
     toast.error("Usuario deslogueado")
     logout(); 
     router.push("/login");
   };
+
+  if (!mounted) {
+    return null;
+  }
 
   return (
     <nav
@@ -59,9 +82,9 @@ export default function NavBar() {
 
       {/* Links */}
       <ul className="w-full flex items-center justify-evenly gap-4 sm:gap-6 font-semibold text-white">
-        <li><Link href="/" className="hover:text-indigo-500 transition text-md md:text-lg">About</Link></li>
+        <li><Link href="/" className="hover:text-indigo-500 transition text-md md:text-lg">Inicio</Link></li>
         <li className="hidden sm:flex"><Link href="#tattoos" className="hover:text-indigo-500 transition text-md md:text-lg">Tattoos</Link></li>
-        <li><Link href="/register" className="hover:text-indigo-500 transition text-md md:text-lg">Turnos</Link></li>
+        <li><Link href={turnosHref} className="hover:text-indigo-500 transition text-md md:text-lg">{turnosLabel}</Link></li>
       </ul>
 
       {/* Ícono de usuario / logout */}

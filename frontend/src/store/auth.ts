@@ -19,7 +19,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   login: (token, user) => {
     localStorage.setItem("token", token);
     localStorage.setItem("user", JSON.stringify(user));
-    set({ token, user });
+    set({ token, user }); // Esto ya sobrescribe ambos en el PATCH también
   },
 
   logout: () => {

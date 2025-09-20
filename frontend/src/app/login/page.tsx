@@ -87,7 +87,7 @@ export default function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="tu@ejemplo.com"
                 required
-                className="mt-1 bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-violet-500 focus:ring-violet-500"
+                className="mt-1 bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-indigo-500 focus:ring-indigo-500"
               />
             </div>
 
@@ -104,7 +104,7 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="********"
                   required
-                  className="w-full bg-gray-800 border-gray-600 text-white placeholder-gray-400 pr-10 focus:border-blue-500 focus:ring-blue-500" // Añadido 'pr-10' para dejar espacio al icono
+                  className="w-full bg-gray-800 border-gray-600 text-white placeholder-gray-400 pr-10 focus:border-indigo-500 focus:ring-indigo-500"
                 />
                 <Button
                   type="button"
