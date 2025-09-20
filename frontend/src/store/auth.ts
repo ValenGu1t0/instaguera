@@ -9,11 +9,13 @@ interface AuthState {
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
-
-  // Podemos importar estas dos variables para autenticación o ruteo
+  // Guardamos token y user desde localStorage si existen
   token: typeof window !== "undefined" ? localStorage.getItem("token") : null,
-  user: null, 
-  
+  user:
+    typeof window !== "undefined" && localStorage.getItem("user")
+      ? JSON.parse(localStorage.getItem("user") as string)
+      : null,
+
   login: (token, user) => {
     localStorage.setItem("token", token);
     localStorage.setItem("user", JSON.stringify(user));
@@ -25,5 +27,4 @@ export const useAuthStore = create<AuthState>((set) => ({
     localStorage.removeItem("user");
     set({ token: null, user: null });
   },
-
 }));

@@ -1,20 +1,26 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation"; 
+import { useAuthStore } from "@/store/auth";
+import { LogOut, User } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { toast } from "sonner";
 
 export default function NavBar() {
-    
+  
   const [visible, setVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+
+  const router = useRouter();
+  const { token, logout } = useAuthStore();
 
   const controlNavbar = () => {
     if (typeof window !== "undefined") {
       if (window.scrollY > lastScrollY) {
-        // scrolleando hacia abajo -> ocultar navbar
         setVisible(false);
       } else {
-        // scrolleando hacia arriba -> mostrar navbar
         setVisible(true);
       }
       setLastScrollY(window.scrollY);
@@ -30,14 +36,21 @@ export default function NavBar() {
     }
   }, [lastScrollY]);
 
+  const handleLogout = () => {
+    toast.error("Usuario deslogueado")
+    logout(); 
+    router.push("/login");
+  };
+
   return (
     <nav
-      className={`fixed top-10 left-1/2 z-50 w-[80%] max-w-5xl -translate-x-1/2 
+      className={`fixed top-10 left-1/2 z-50 w-[80%] max-w-5xl -translate-x-1/2
       rounded-4xl transition-transform duration-300
       bg-gradient-to-r from-white/20 via-white/10 to-white/10
       backdrop-blur-xl shadow-lg border border-white/20
       flex flex-row px-4 py-2 sm:px-8 sm:py-4 sm:justify-between md:w-1/2 md:gap-8
-      ${visible ? "translate-y-0" : "-translate-y-32"}`}
+      ${visible ? "translate-y-0" : "-translate-y-32"}
+      items-center`}
     >
       {/* Logo */}
       <Link href="/" className="text-xl font-semibold italic text-white hidden sm:flex">
@@ -45,11 +58,40 @@ export default function NavBar() {
       </Link>
 
       {/* Links */}
-      <ul className="w-full flex items-center justify-evenly gap-6 font-semibold text-white">
-        <li><Link href="/" className="hover:text-indigo-500 transition md:text-lg">About</Link></li>
-        <li><Link href="#tattoos" className="hover:text-indigo-500 transition md:text-lg">Tattoos</Link></li>
-        <li><Link href="/register" className="hover:text-indigo-500 transition md:text-lg">Turnos</Link></li>
+      <ul className="w-full flex items-center justify-evenly gap-4 sm:gap-6 font-semibold text-white">
+        <li><Link href="/" className="hover:text-indigo-500 transition text-md md:text-lg">About</Link></li>
+        <li className="hidden sm:flex"><Link href="#tattoos" className="hover:text-indigo-500 transition text-md md:text-lg">Tattoos</Link></li>
+        <li><Link href="/register" className="hover:text-indigo-500 transition text-md md:text-lg">Turnos</Link></li>
       </ul>
+
+      {/* Ícono de usuario / logout */}
+      <div className="flex items-center ml-auto"> 
+
+        {/* Si hay un user logueado.. */}
+        {token ? (
+          <Button
+            variant="ghost"
+            size="icon" 
+            onClick={handleLogout}
+            className="text-white hover:bg-white/20 hover:text-red-400 cursor-pointer"
+            title="Cerrar Sesión" 
+          >
+            <LogOut className="h-5 w-5" />
+          </Button>
+        ) : ( 
+          <Button
+            asChild 
+            variant="ghost"
+            size="icon"
+            className="text-white hover:bg-white/20 hover:text-indigo-400"
+            title="Iniciar Sesión / Registrarse"
+          >
+            <Link href="/login">
+              <User className="h-5 w-5" />
+            </Link>
+          </Button>
+        )}
+      </div>
     </nav>
   );
 }

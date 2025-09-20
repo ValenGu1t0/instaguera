@@ -6,34 +6,41 @@ import { ReactNode, useEffect, useState } from "react";
 
 interface ProtectedRouteProps {
   children: ReactNode;
-  roles?: string[]; // opcional: ["ADMIN"], ["CLIENTE"], etc
+  roles?: string[];
 }
 
 export default function ProtectedRoute({ children, roles }: ProtectedRouteProps) {
 
     const { token, user } = useAuthStore();
     const router = useRouter();
+    const [loading, setLoading] = useState(true);
     const [isAuthorized, setIsAuthorized] = useState(false);
 
     useEffect(() => {
-        // Si no hay token, redirigimos al login
+
         if (!token) {
-            router.replace("/login");
-            return;
+        router.replace("/login");
+        return;
         }
 
-        // Si hay roles definidos y el usuario no cumple
         if (roles && user && !roles.includes(user.role)) {
-            router.replace("/"); // o a una página 403
-            return;
+        router.replace("/"); // o /403 si tenés una página de error
+        return;
         }
 
         setIsAuthorized(true);
+        setLoading(false);
     }, [token, user, roles, router]);
 
-    if (!isAuthorized) {
-        return null; // o un spinner de carga
+    if (loading) {
+        return (
+        <div className="flex items-center justify-center h-screen">
+            <p className="text-lg text-indigo-500">Cargando...</p>
+        </div>
+        );
     }
+
+    if (!isAuthorized) return null;
 
     return <>{children}</>;
 }
