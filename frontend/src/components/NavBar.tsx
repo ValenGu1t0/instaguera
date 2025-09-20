@@ -48,7 +48,7 @@ export default function NavBar() {
       <ul className="w-full flex items-center justify-evenly gap-6 font-semibold text-white">
         <li><Link href="/" className="hover:text-indigo-500 transition md:text-lg">About</Link></li>
         <li><Link href="#tattoos" className="hover:text-indigo-500 transition md:text-lg">Tattoos</Link></li>
-        <li><Link href="/turnos" className="hover:text-indigo-500 transition md:text-lg">Turnos</Link></li>
+        <li><Link href="/register" className="hover:text-indigo-500 transition md:text-lg">Turnos</Link></li>
       </ul>
     </nav>
   );

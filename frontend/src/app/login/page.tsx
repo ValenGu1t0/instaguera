@@ -4,6 +4,10 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/auth";
 import { AuthResponse } from "@/types";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -12,6 +16,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false); // Estado para el loading del botón
   const router = useRouter();
   const login = useAuthStore((state) => state.login);
 
@@ -19,6 +24,8 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
 
     e.preventDefault();
+    setLoading(true);    // Activar loading
+    setError("");       // Limpiar errores previos
 
     try {
       const res = await fetch(`${API_URL}/auth/login`, {
@@ -27,62 +34,106 @@ export default function LoginPage() {
         body: JSON.stringify({ email, password }),
       });
 
-      if (!res.ok) throw new Error("Error en login");
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Error en login");
+      }
 
       const data: AuthResponse = await res.json();
 
       login(data.token, data.user);
 
-      console.log(data.user)
+      console.log(data.user);
 
-      router.push("/");         // home o lo que sea que quiera despues je
+      router.push("/"); // home o lo que sea que quiera despues je
 
     } catch (err) {
 
       setError("Credenciales inválidas");
       console.error(err);
+
+    } finally {
+      setLoading(false); // Desactivar loading
     }
   };
 
   return (
+    
+    <div className="flex flex-col justify-center items-center w-screen h-screen bg-gradient-to-br from-gray-900 to-black p-4">
+      
+      <h2 className="text-3xl font-semibold my-12 italic text-indigo-700">Instaguera</h2>
 
-    <div className="flex flex-col justify-center items-center w-screen h-screen">
-
-      <form
-        onSubmit={handleSubmit}
-        className="flex flex-col p-6 gap-4 bg-gray-400 rounded-xl text-black w-1/2 md:w-1/3"
-      >
-        <div> 
-          <label>
-            Email
-          </label>
-          <input
-            className="bg-white border border-blue-100 p-1"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </div>
+      <Card className="w-full max-w-md bg-opacity-10 my-8 bg-gray-700 backdrop-filter backdrop-blur-lg border border-gray-700 text-white shadow-lg">
         
-        <div>
-          <label>
-            Contraseña
-          </label>
-          <input
-            className="bg-white border border-blue-100 p-1"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </div>
-        
+        <CardHeader className="text-center">
+          <CardTitle className="text-3xl font-bold text-gray-100">Iniciar Sesión</CardTitle>
+          <CardDescription className="text-gray-300">
+            Ingresa tus credenciales para acceder a tu cuenta.
+          </CardDescription>
+        </CardHeader>
 
-        <button type="submit" className="p-2 bg-amber-600 rounded-lg cursor-pointer hover:bg-amber-300 transition">
-          Login
-        </button>
-        {error && <p>{error}</p>}
-      </form>
+        <CardContent>
 
+          <form onSubmit={handleSubmit} className="space-y-6">
+
+            {/* Email */}
+            <div>
+              <Label htmlFor="email" className="text-gray-200">
+                Email
+              </Label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="tu@ejemplo.com"
+                required
+                className="mt-1 bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-violet-500 focus:ring-violet-500"
+              />
+            </div>
+
+            {/* Password */}
+            <div>
+              <Label htmlFor="password" className="text-gray-200">
+                Contraseña
+              </Label>
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="********"
+                required
+                className="mt-1 bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-violet-500 focus:ring-violet-500"
+              />
+            </div>
+
+            {error && (
+              <p className="text-red-400 text-sm text-center" role="alert">
+                {error}
+              </p>
+            )}
+
+            {/* Submit */}
+            <Button
+              type="submit"
+              className="w-full bg-indigo-700 hover:bg-indigo-900 cursor-pointer text-white font-semibold py-2 rounded-md transition-colors duration-300"
+              disabled={loading} 
+            >
+              {loading ? "Cargando..." : "Iniciar Sesión"}
+            </Button>
+          </form>
+
+          {/* Register */}
+          <p className="mt-4 text-center text-gray-400 text-sm">
+            ¿No tienes cuenta?{" "}
+            <a href="/register" className="text-indigo-400 hover:underline">
+              Regístrate
+            </a>
+          </p>
+        </CardContent>
+      
+      </Card>
     </div>
   );
 }
