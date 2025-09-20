@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { toast } from "sonner";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -24,8 +25,8 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
 
     e.preventDefault();
-    setLoading(true);    // Activar loading
-    setError("");       // Limpiar errores previos
+    setLoading(true);    
+    setError("");       
 
     try {
       const res = await fetch(`${API_URL}/auth/login`, {
@@ -42,18 +43,17 @@ export default function LoginPage() {
       const data: AuthResponse = await res.json();
 
       login(data.token, data.user);
-
       console.log(data.user);
-
-      router.push("/"); // home o lo que sea que quiera despues je
+      toast.success("Usuario logueado correctamente!")
+      router.push("/");             // home o lo que sea que quiera despues je
 
     } catch (err) {
 
-      setError("Credenciales inválidas");
       console.error(err);
+      toast.error("Credenciales inválidas")
 
     } finally {
-      setLoading(false); // Desactivar loading
+      setLoading(false); 
     }
   };
 
@@ -61,13 +61,11 @@ export default function LoginPage() {
     
     <div className="flex flex-col justify-center items-center w-screen h-screen bg-gradient-to-br from-gray-900 to-black p-4">
       
-      <h2 className="text-3xl font-semibold my-12 italic text-indigo-700">Instaguera</h2>
-
-      <Card className="w-full max-w-md bg-opacity-10 my-8 bg-gray-700 backdrop-filter backdrop-blur-lg border border-gray-700 text-white shadow-lg">
+      <Card className="w-full p-2 my-16 max-w-md bg-opacity-10 bg-gray-700 backdrop-filter backdrop-blur-lg border border-gray-700 text-white shadow-lg">
         
         <CardHeader className="text-center">
-          <CardTitle className="text-3xl font-bold text-gray-100">Iniciar Sesión</CardTitle>
-          <CardDescription className="text-gray-300">
+          <CardTitle className="text-3xl font-bold text-white">Iniciar Sesión</CardTitle>
+          <CardDescription className="text-white">
             Ingresa tus credenciales para acceder a tu cuenta.
           </CardDescription>
         </CardHeader>
