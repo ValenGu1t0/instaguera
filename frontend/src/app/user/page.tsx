@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react"; // Importar useCallback
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/auth";
 import { toast } from "sonner";
@@ -12,7 +12,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-
 import {
   Dialog,
   DialogContent,
@@ -22,98 +21,89 @@ import {
   DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { UserRoundPen, Trash2, CalendarCheck, Info } from "lucide-react";
-
-// Importa tus tipos
-import { Usuario, Turno } from "@/types"; // Asegúrate de que la ruta sea correcta
-import UserEditForm from "./UserEditForm"; // Importa el componente UserEditForm
+import { UserRoundPen, Trash2, CalendarCheck, Info, Plus } from "lucide-react";
+import UserEditForm from "./UserEditForm"; 
 import Link from "next/link";
+import TurnoForm from "./TurnoForm";
+import { Usuario, Turno } from "@/types"; 
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const TATUADOR_ID = 1; // ID constante del tatuador único
 
 export default function UserPanelPage() {
 
     const router = useRouter();
     const { user, token, logout, login } = useAuthStore();
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+    const [isDeleteUserDialogOpen, setIsDeleteUserDialogOpen] = useState(false); // Renombrado para claridad
     const [userTurns, setUserTurns] = useState<Turno[]>([]);
     const [loadingTurns, setLoadingTurns] = useState(true);
 
-    useEffect(() => {
+    // Estados específicos para la gestión de turnos
+    const [isTurnoFormOpen, setIsTurnoFormOpen] = useState(false); 
+    const [editingTurno, setEditingTurno] = useState<Turno | null>(null); 
+    const [deletingTurnoId, setDeletingTurnoId] = useState<number | null>(null);
 
-        if (typeof window !== "undefined" && !token) {
-        router.push("/login");
-        toast.error("Debes iniciar sesión para ver esta página.");
-
-        } else if (user) {
-
-        console.log(API_URL)
-        console.log(user)
-        console.log(token)
-
-        // Si el usuario está logueado, podríamos cargar sus turnos
-        // fetchUserTurns(user.id); // Implementa esta función si tienes un endpoint de turnos
-        // Por ahora, simulamos datos de turnos
-
-        setTimeout(() => {
-            // Asegúrate de que los datos simulados coincidan con la interfaz 'Turno'
-            setUserTurns([
-            {
-                id: 1, // id es number
-                fechaHora: "2024-08-15T10:00:00Z", // Formato ISO 8601
-                estado: "CONFIRMADO", // Usa los estados definidos en 'Turno'
-                descripcion: "Tatuaje de un lobo en el brazo",
-                cliente: user, // Asigna el objeto de usuario completo
-                dueno: { // Asigna un objeto de usuario completo para el dueño/artista
-                    id: 101,
-                    nombre: "Juan",
-                    apellido: "Pérez",
-                    celular: "1112223333",
-                    username: "jperez",
-                    email: "juan.perez@example.com",
-                    role: "DUENO"
-                }
-            },
-            {
-                id: 2,
-                fechaHora: "2024-09-01T14:30:00Z",
-                estado: "SOLICITADO",
-                descripcion: "Retoque de diseño floral en la espalda",
-                cliente: user,
-                dueno: {
-                    id: 102,
-                    nombre: "María",
-                    apellido: "García",
-                    celular: "4445556666",
-                    username: "mgarcia",
-                    email: "maria.garcia@example.com",
-                    role: "DUENO"
-                }
-            },
-            ]);
+    // Función para obtener los turnos del usuario - Envuelto en useCallback
+    const fetchUserTurns = useCallback(async (userId: number) => {
+        if (!token) {
             setLoadingTurns(false);
-        }, 1000);
+            return;
         }
-    }, [token, router, user, login]); 
+        setLoadingTurns(true);
+        try {
+            // Se asume que el backend tiene un endpoint para obtener turnos por cliente,
+            // o que el endpoint /turnos permite filtrar por cliente si es admin.
+            // Por ahora, mantenemos el filtrado en frontend si el endpoint general devuelve todos.
+            const res = await fetch(`${API_URL}/turnos?clienteId=${userId}`, { // Endpoint ideal: /turnos?clienteId={userId}
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            if (!res.ok) {
+                throw new Error("Error al cargar los turnos.");
+            }
+
+            const allTurns: Turno[] = await res.json();
+            // Filtrar en frontend si el endpoint anterior no soporta filtrado por cliente
+            // Si el backend ya filtra por cliente, esta línea no sería estrictamente necesaria
+            const userSpecificTurns = allTurns.filter(turno => turno.cliente?.id === userId); 
+            setUserTurns(userSpecificTurns);
+
+        } catch (error) {
+            toast.error("Hubo un error al cargar tus turnos.");
+            console.error("Error fetching user turns:", error);
+            setUserTurns([]);
+        } finally {
+            setLoadingTurns(false);
+        }
+    }, [token]); // token como dependencia
+
+    // useEffect para la autenticación y carga de turnos
+    useEffect(() => {
+        if (typeof window !== "undefined") {
+            if (!token) {
+                router.push("/login");
+                toast.error("Debes iniciar sesión para ver esta página.");
+            } else if (user && user.id) { // Asegúrate de que user y user.id existen
+                fetchUserTurns(user.id);
+            }
+        }
+    }, [token, router, user, fetchUserTurns]); // fetchUserTurns como dependencia
 
 
-    
-    // Actualiza al user con el nuevo patch
+    // Actualiza al user con el nuevo patch (existente)
     const handleUserUpdate = (updatedUser: Usuario) => {
         if (token) {
-        login(token, updatedUser);
+            login(token, updatedUser);
         }
         setIsEditDialogOpen(false);
     };
 
-    // Función para eliminar usuario
+    // DELETE Usuario (existente)
     const handleDeleteUser = async () => {
-
         if (!user || !token) return;
-
-        console.log(token)
-        console.log(user);
 
         try {
             const res = await fetch(`${API_URL}/usuarios/${user.id}`, {
@@ -121,49 +111,158 @@ export default function UserPanelPage() {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
-        });
+            });
 
-        if (!res.ok) {
-            const errorData = await res.json();
-            throw new Error(errorData.message || "Error al eliminar usuario");
-        }
+            if (!res.ok) {
+                const errorData = await res.json();
+                throw new Error(errorData.message || "Error al eliminar usuario");
+            }
 
-        toast.success("Tu cuenta ha sido eliminada. Gracias por ser parte!");
-        logout();
-        router.push("/");
-
+            toast.success("Tu cuenta ha sido eliminada. ¡Gracias por ser parte!");
+            logout();
+            router.push("/");
         } catch (err) {
             toast.error("Error al eliminar tu cuenta.");
             console.error(err);
-
         } finally {
-            setIsDeleteDialogOpen(false);
+            setIsDeleteUserDialogOpen(false); // Usar el nuevo estado
         }
+    };
+
+    // Abre el formulario para crear un nuevo turno
+    const handleOpenCreateTurno = () => {
+        setEditingTurno(null); // Asegura que el formulario esté vacío para un nuevo turno
+        setIsTurnoFormOpen(true);
+    };
+
+    // Abre el formulario para editar un turno existente
+    const handleOpenEditTurno = (turno: Turno) => {
+        setEditingTurno(turno);
+        setIsTurnoFormOpen(true);
+    };
+
+    // SUBMIT POST / PATCH Turnos 
+    const handleCreateUpdateTurno = async (turnoData: Partial<Turno>) => {
+
+        if (!token || !user) {
+            toast.error("No estás autenticado o no se pudo obtener tu información de usuario.");
+            return;
+        }
+
+        try {
+            let res;
+            if (editingTurno) {
+                // Actualizar turno existente
+                // Solo se puede modificar la descripción por el cliente
+                res = await fetch(`${API_URL}/turnos/${editingTurno.id}`, {
+                    method: "PATCH",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                    // Solo enviar los campos que el cliente puede modificar.
+                    // El backend se encargará de ignorar cambios a 'dueno', 'cliente', 'estado' si no está permitido
+                    // y de aplicar el cambio de 'fechaHora' si las 48h lo permiten.
+                    body: JSON.stringify({
+                        descripcion: turnoData.descripcion,
+                        fechaHora: turnoData.fechaHora, // Permitir cambio de fecha si canModifyTurno lo permite
+                    }),
+                });
+            } else {
+                // Crear nuevo turno
+                res = await fetch(`${API_URL}/turnos`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({
+                        ...turnoData,
+                        cliente: { id: user.id }, // El cliente es el usuario logueado
+                        dueno: { id: TATUADOR_ID }, // El dueño es el tatuador único y constante
+                        estado: "SOLICITADO", // Un nuevo turno siempre inicia como 'SOLICITADO'
+                    }),
+                });
+            }
+
+            if (!res.ok) {
+                const errorData = await res.json();
+                throw new Error(errorData.message || `Error al ${editingTurno ? 'actualizar' : 'crear'} el turno`);
+            }
+
+            toast.success(`Turno ${editingTurno ? 'actualizado' : 'creado'} exitosamente.`);
+            fetchUserTurns(user.id); // Recargar los turnos para reflejar los cambios
+            setIsTurnoFormOpen(false); // Cerrar el modal
+            
+        } catch (error) { // Especificar tipo 'any' para el error
+            toast.error("Error al ${editingTurno ? 'actualizar' : 'crear'} el turno.");
+            console.error(error);
+        }
+    };
+
+    // DELETE Turno
+    const confirmDeleteTurno = async () => {
+
+        if (!token || !user || !deletingTurnoId) {
+             toast.error("No estás autenticado o no hay un turno seleccionado para eliminar.");
+             return;
+        }
+
+        try {
+            const res = await fetch(`${API_URL}/turnos/${deletingTurnoId}`, {
+                method: "DELETE",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            if (!res.ok) {
+                const errorData = await res.json();
+                throw new Error(errorData.message || "Error al eliminar el turno.");
+            }
+
+            toast.success("Turno eliminado exitosamente.");
+            fetchUserTurns(user.id); // Recargar los turnos
+            setDeletingTurnoId(null); // Limpiar el ID del turno a eliminar
+            setIsDeleteUserDialogOpen(false); // Asegurarse de que el diálogo correcto se cierre
+
+        } catch (error) {
+            toast.error("Error al eliminar el turno");
+            console.error(error);
+        }
+    };
+
+    // Función para verificar si un turno se puede modificar (editar o eliminar)
+    // Debe tener al menos 48 horas de antelación
+    const canModifyTurno = (fechaHora: string) => {
+        const turnoDate = new Date(fechaHora);
+        const now = new Date();
+        const diffHours = (turnoDate.getTime() - now.getTime()) / (1000 * 60 * 60);
+        return diffHours >= 48;
     };
 
     if (!user) {
         return (
-            <div className="flex justify-center items-center h-screen bg-gradient-to-br from-gray-900 to-black text-white">
+            <div className="flex justify-center items-center h-screen text-2xl bg-gradient-to-br from-gray-900 to-black text-white">
                 Cargando datos de usuario...
             </div>
         );
     }
 
     return (
-
         <div className="flex min-h-screen flex-col items-center bg-gradient-to-br from-gray-900 to-black text-white">
-            
-            <header className="w-full p-6 bg-gray-700 flex flex-row justify-between items-center">      
+
+            <header className="w-full p-6 bg-gray-700 flex flex-row justify-between items-center">
                 <Link href="/"><h2 className="text-2xl font-semibold italic text-indigo-400">Instaguera</h2></Link>
             </header>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full max-w-2/3 mt-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full max-w-[calc(100%-4rem)] px-8 mt-8"> {/* Ajuste de max-w y px */}
 
-                {/* Información de Usuario */}
+                {/* Información de Usuario (EXISTENTE) */}
                 <Card className="bg-opacity-10 bg-gray-600 backdrop-filter backdrop-blur-lg border border-indigo-700 text-white shadow-lg">
                     <CardHeader>
                         <CardTitle className="text-2xl font-bold text-gray-100 flex items-center gap-2">
-                        <Info className="h-6 w-6 text-blue-400" /> Tus Datos
+                            <Info className="h-6 w-6 text-blue-400" /> Tus Datos
                         </CardTitle>
                         <CardDescription className="text-gray-300">
                             Información de tu perfil.
@@ -188,7 +287,7 @@ export default function UserPanelPage() {
                     </CardContent>
                 </Card>
 
-                {/* Editar / Eliminar usuario */}
+                {/* Editar / Eliminar usuario (EXISTENTE) */}
                 <Card className="bg-opacity-10 bg-gray-600 backdrop-filter backdrop-blur-lg border border-indigo-700 text-white shadow-lg flex flex-col justify-between">
                     <CardHeader>
                         <CardTitle className="text-2xl font-bold text-gray-100 flex items-center gap-2">
@@ -200,123 +299,221 @@ export default function UserPanelPage() {
                     </CardHeader>
                     <CardContent className="flex flex-col gap-4">
                         <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-                        <DialogTrigger asChild>
-                            <Button className="w-full bg-indigo-600 hover:bg-indigo-800 text-white flex items-center gap-2 cursor-pointer">
-                            <UserRoundPen className="h-4 w-4" /> Modificar Perfil
-                            </Button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-[425px] bg-gray-900 border-gray-700 text-white">
-                            <DialogHeader>
-                            <DialogTitle className="text-blue-300">Editar Perfil</DialogTitle>
-                            <DialogDescription className="text-gray-400">
-                                Realiza cambios en tu información. Haz clic en guardar cuando termines.
-                            </DialogDescription>
-                            </DialogHeader>
-                            <UserEditForm
-                            userData={user} 
-                            onUpdateSuccess={handleUserUpdate}
-                            onClose={() => setIsEditDialogOpen(false)}
-                            />
-                        </DialogContent>
-                    </Dialog>
+                            <DialogTrigger asChild>
+                                <Button className="w-full bg-indigo-600 hover:bg-indigo-800 text-white flex items-center gap-2 cursor-pointer">
+                                    <UserRoundPen className="h-4 w-4" /> Modificar Perfil
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent className="sm:max-w-[425px] bg-gray-900 border-gray-700 text-white">
+                                <DialogHeader>
+                                    <DialogTitle className="text-blue-300">Editar Perfil</DialogTitle>
+                                    <DialogDescription className="text-gray-400">
+                                        Realiza cambios en tu información. Haz clic en guardar cuando termines.
+                                    </DialogDescription>
+                                </DialogHeader>
+                                <UserEditForm
+                                    userData={user}
+                                    onUpdateSuccess={handleUserUpdate}
+                                    onClose={() => setIsEditDialogOpen(false)}
+                                />
+                            </DialogContent>
+                        </Dialog>
 
-                    <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-                        <DialogTrigger asChild>
-                            <Button
-                            variant="destructive"
-                            className="w-full bg-red-700 hover:bg-red-800 text-white flex items-center gap-2 cursor-pointer"
-                            >
-                            <Trash2 className="h-4 w-4" /> Eliminar Cuenta
-                            </Button>
-                        </DialogTrigger>
+                        {/* Diálogo de Eliminación de Usuario (EXISTENTE) */}
+                        <Dialog open={isDeleteUserDialogOpen} onOpenChange={setIsDeleteUserDialogOpen}> 
+                            <DialogTrigger asChild>
+                                <Button
+                                    variant="destructive"
+                                    className="w-full bg-red-700 hover:bg-red-800 text-white flex items-center gap-2 cursor-pointer"
+                                    onClick={() => setIsDeleteUserDialogOpen(true)} 
+                                >
+                                    <Trash2 className="h-4 w-4" /> Eliminar Cuenta
+                                </Button>
+                            </DialogTrigger>
 
-                        <DialogContent className="sm:max-w-[425px] bg-gray-900 border-gray-700 text-white">
-                            <DialogHeader>
-                            <DialogTitle className="text-red-400">Confirmar Eliminación</DialogTitle>
-                            <DialogDescription className="text-gray-400">
-                                ¿Estás seguro de que quieres eliminar tu cuenta? Esta acción es irreversible.
-                            </DialogDescription>
-                            </DialogHeader>
-                            <DialogFooter>
-                            <Button
-                                variant="outline"
-                                onClick={() => setIsDeleteDialogOpen(false)}
-                                className="text-white hover:bg-gray-700 cursor-pointer"
-                            >
-                                Cancelar
-                            </Button>
-                            <Button
-                                variant="destructive"
-                                onClick={handleDeleteUser}
-                                className="bg-red-600 hover:bg-red-700 text-white cursor-pointer"
-                            >
-                                Sí, Eliminar
-                            </Button>
-                            </DialogFooter>
-                        </DialogContent>
-
-                    </Dialog>
-                </CardContent>
+                            <DialogContent className="sm:max-w-[425px] bg-gray-900 border-gray-700 text-white">
+                                <DialogHeader>
+                                    <DialogTitle className="text-red-400">Confirmar Eliminación</DialogTitle>
+                                    <DialogDescription className="text-gray-400">
+                                        ¿Estás seguro de que quieres eliminar tu cuenta? Esta acción es irreversible.
+                                    </DialogDescription>
+                                </DialogHeader>
+                                <DialogFooter>
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => setIsDeleteUserDialogOpen(false)}
+                                        className="text-white hover:bg-gray-700 cursor-pointer"
+                                    >
+                                        Cancelar
+                                    </Button>
+                                    <Button
+                                        variant="destructive"
+                                        onClick={handleDeleteUser}
+                                        className="bg-red-600 hover:bg-red-700 text-white cursor-pointer"
+                                    >
+                                        Sí, Eliminar
+                                    </Button>
+                                </DialogFooter>
+                            </DialogContent>
+                        </Dialog>
+                    </CardContent>
                 </Card>
 
             </div>
 
-            {/* Turnos Programados */}
-            <div className="w-full my-8 max-w-2/3">
+            {/* Turnos Programados (MODIFICADO) */}
+            <div className="w-full my-8 max-w-[calc(100%-4rem)] px-8">
                 <Card className="bg-opacity-10 bg-gray-600 backdrop-filter backdrop-blur-lg border-2 border-indigo-700 text-white shadow-lg">
                     <CardHeader>
                         <CardTitle className="text-2xl font-bold text-gray-100 flex items-center gap-2">
-                        <CalendarCheck className="h-6 w-6 text-green-400" /> Tus Próximos Turnos
+                            <CalendarCheck className="h-6 w-6 text-green-400" /> Tus Próximos Turnos
                         </CardTitle>
                         <CardDescription className="text-gray-300">
-                        Aquí puedes ver y gestionar tus citas para tatuajes.
+                            Aquí puedes ver y gestionar tus citas para tatuajes.
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         {loadingTurns ? (
-                        <p className="text-gray-400">Cargando turnos...</p>
-                        ) : userTurns.length === 0 ? (
-                        <p className="text-gray-400">No tienes turnos programados.</p>
+                            <p className="text-gray-400">Cargando turnos...</p>
                         ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {userTurns.map((turno) => (
-                            <Card
-                                key={turno.id}
-                                className="bg-gray-800 border-gray-600 text-white p-4 transition-transform hover:scale-105 duration-200"
-                            >
-                                <CardTitle className="text-xl text-blue-300 mb-2">
-                                {turno.descripcion}
-                                </CardTitle>
-                                <CardDescription className="text-gray-400">
-                                Artista: {turno.dueno.nombre} {turno.dueno.apellido}
-                                </CardDescription>
-                                <p className="mt-2 text-sm">
-                                <strong className="text-gray-300">Fecha y Hora:</strong>{" "}
-                                {new Date(turno.fechaHora).toLocaleString()}
-                                </p>
-                                <p className="text-sm">
-                                <strong className="text-gray-300">Estado:</strong>{" "}
-                                <span
-                                    className={`font-semibold ${
-                                    turno.estado === "CONFIRMADO"
-                                        ? "text-green-400"
-                                        : turno.estado === "SOLICITADO"
-                                        ? "text-yellow-400"
-                                        : "text-red-400"
-                                    }`}
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {/* Card para sacar un nuevo turno (card fantasma) */}
+                                <Card
+                                    className="bg-gray-800 border-gray-600 text-white p-4 flex flex-col justify-center items-center transition-transform hover:scale-105 duration-200 cursor-pointer h-48"
+                                    onClick={handleOpenCreateTurno}
                                 >
-                                    {turno.estado}
-                                </span>
-                                </p>
-                            </Card>
-                            ))}
-                        </div>
+                                    <Plus className="h-12 w-12 text-indigo-400" />
+                                    <p className="mt-2 text-lg text-indigo-300">Sacar Nuevo Turno</p>
+                                </Card>
+
+                                {/* Renderizado de los turnos existentes */}
+                                {userTurns.length === 0 && !loadingTurns ? (
+                                    // Este mensaje se mostrará si no hay turnos y ya terminaron de cargar
+                                    <p className="text-gray-400 col-span-full">No tienes turnos programados. ¡Saca uno nuevo!</p>
+                                ) : (
+                                    userTurns.map((turno) => {
+                                        const canModify = canModifyTurno(turno.fechaHora);
+                                        return (
+                                            <Card
+                                                key={turno.id}
+                                                className="bg-gray-800 border-gray-600 text-white p-4 transition-transform hover:scale-105 duration-200 relative"
+                                            >
+                                                <CardTitle className="text-xl text-blue-300 mb-2">
+                                                    {turno.descripcion}
+                                                </CardTitle>
+                                                <CardDescription className="text-gray-400">
+                                                    Artista: {turno.dueno?.nombre || "N/A"} {turno.dueno?.apellido || ""}
+                                                </CardDescription>
+                                                <p className="mt-2 text-sm">
+                                                    <strong className="text-gray-300">Fecha y Hora:</strong>{" "}
+                                                    {new Date(turno.fechaHora).toLocaleString()}
+                                                </p>
+                                                <p className="text-sm">
+                                                    <strong className="text-gray-300">Estado:</strong>{" "}
+                                                    <span
+                                                        className={`font-semibold ${
+                                                            turno.estado === "CONFIRMADO"
+                                                                ? "text-green-400"
+                                                                : turno.estado === "SOLICITADO"
+                                                                ? "text-yellow-400"
+                                                                : "text-red-400"
+                                                        }`}
+                                                    >
+                                                        {turno.estado}
+                                                    </span>
+                                                </p>
+                                                {/* Botones de acción solo si se puede modificar */}
+                                                {canModify && (
+                                                    <div className="absolute top-2 right-2 flex gap-2">
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation(); // Evita que se dispare el click de la card
+                                                                handleOpenEditTurno(turno);
+                                                            }}
+                                                            className="text-gray-400 hover:text-indigo-400"
+                                                            title="Editar Turno"
+                                                        >
+                                                            <UserRoundPen className="h-4 w-4" />
+                                                        </Button>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation(); // Evita que se dispare el click de la card
+                                                                setDeletingTurnoId(turno.id); // Establece el turno a eliminar
+                                                                setIsDeleteUserDialogOpen(true); // Abre el diálogo de confirmación
+                                                            }}
+                                                            className="text-gray-400 hover:text-red-400"
+                                                            title="Eliminar Turno"
+                                                        >
+                                                            <Trash2 className="h-4 w-4" />
+                                                        </Button>
+                                                    </div>
+                                                )}
+                                            </Card>
+                                        );
+                                    })
+                                )}
+                            </div>
                         )}
                     </CardContent>
                 </Card>
             </div>
 
-        </div>
+            {/* Diálogo para Crear/Editar Turno (MODAL) */}
+            <Dialog open={isTurnoFormOpen} onOpenChange={setIsTurnoFormOpen}>
+                <DialogContent className="sm:max-w-[425px] bg-gray-900 border-gray-700 text-white">
+                    <DialogHeader>
+                        <DialogTitle className="text-blue-300">{editingTurno ? "Editar Turno" : "Sacar Nuevo Turno"}</DialogTitle>
+                        <DialogDescription className="text-gray-400">
+                            Completa los detalles para tu cita.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <TurnoForm
+                        initialData={editingTurno}
+                        onSubmitSuccess={handleCreateUpdateTurno}
+                        onClose={() => setIsTurnoFormOpen(false)}
+                        canModifyTurno={canModifyTurno} // Pasamos la función al TurnoForm
+                    />
+                </DialogContent>
+            </Dialog>
 
+            {/* Diálogo de Confirmación para Eliminar Turno Específico */}
+            <Dialog open={deletingTurnoId !== null && isDeleteUserDialogOpen} onOpenChange={(open) => {
+                setIsDeleteUserDialogOpen(open);
+                if (!open) setDeletingTurnoId(null); // Limpiar si se cierra el diálogo
+            }}>
+                <DialogContent className="sm:max-w-[425px] bg-gray-900 border-gray-700 text-white">
+                    <DialogHeader>
+                        <DialogTitle className="text-red-400">Confirmar Eliminación de Turno</DialogTitle>
+                        <DialogDescription className="text-gray-400">
+                            ¿Estás seguro de que quieres eliminar este turno? Esta acción no se puede deshacer.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                        <Button
+                            variant="outline"
+                            onClick={() => {
+                                setIsDeleteUserDialogOpen(false);
+                                setDeletingTurnoId(null);
+                            }}
+                            className="text-white hover:bg-gray-700 cursor-pointer"
+                        >
+                            Cancelar
+                        </Button>
+                        <Button
+                            variant="destructive"
+                            onClick={confirmDeleteTurno}
+                            className="bg-red-600 hover:bg-red-700 text-white cursor-pointer"
+                        >
+                            Sí, Eliminar
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+        </div>
     );
 }
