@@ -23,7 +23,7 @@ export default function LoginPage() {
   const router = useRouter();
   const login = useAuthStore((state) => state.login);
 
-  //POST Login
+  // POST Login
   const handleSubmit = async (e: React.FormEvent) => {
 
     e.preventDefault();
@@ -39,10 +39,12 @@ export default function LoginPage() {
 
       if (!res.ok) {
         const errorData = await res.json();
-        throw new Error(errorData.message || "Error en login");
+        toast.error("Credenciales incorrectas!", errorData)
       }
 
       const data: AuthResponse = await res.json();
+
+      console.log(data.token);
 
       login(data.token, data.user);
       toast.success("Usuario logueado correctamente!")

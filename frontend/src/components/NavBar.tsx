@@ -17,6 +17,8 @@ export default function NavBar() {
   const router = useRouter();
   const { token, user, logout } = useAuthStore();
 
+  console.log(token);
+
   let turnosHref = "/login";
   let turnosLabel = "Turnos";
 
@@ -56,9 +58,9 @@ export default function NavBar() {
   }, [controlNavbar]); 
 
   const handleLogout = () => {
-    toast.error("Usuario deslogueado")
+    toast.error("Usuario deslogueado!")
     logout(); 
-    router.push("/login");
+    router.push("/");
   };
 
   if (!mounted) {

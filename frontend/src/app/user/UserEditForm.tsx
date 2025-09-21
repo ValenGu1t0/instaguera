@@ -55,21 +55,22 @@ export default function UserEditForm({
 
             if (!res.ok) {
                 const errorData = await res.json();
-                toast.error("Error al actualizar el usuario.")
-                throw new Error(errorData.message || "Error al actualizar usuario");
+                toast.error("Error interno.")
+                throw new Error(errorData.message || "Error interno.");
             }
 
-            const updatedUser: Usuario = await res.json(); // Asegura que la respuesta sea de tipo Usuario
+            const updatedUser: Usuario = await res.json();
             toast.success("Perfil actualizado correctamente!");
             onUpdateSuccess(updatedUser);
             onClose();
 
             } catch (err) {
-            setError("Error al actualizar. Intenta de nuevo.");
-            console.error(err);
+                setError("Error al actualizar. Intenta de nuevo.");
+                toast.error("Error al actualizar el usuario.")
+                console.error(err);
 
             } finally {
-            setLoading(false);
+                setLoading(false);
         }
     };
     

@@ -50,7 +50,7 @@ export default function Register() {
             }
 
             // Podria mejorarlo a loguear automaticamente con el register..
-            toast.success("Usuario creado correctamente! Ahora, logueate!")
+            toast.success("Usuario creado correctamente! Gracias por sumarte!")
             router.push("/login?success=true");
 
         } catch (err) {

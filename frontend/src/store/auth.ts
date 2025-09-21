@@ -9,6 +9,7 @@ interface AuthState {
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
+
   // Guardamos token y user desde localStorage si existen
   token: typeof window !== "undefined" ? localStorage.getItem("token") : null,
   user:
@@ -19,7 +20,9 @@ export const useAuthStore = create<AuthState>((set) => ({
   login: (token, user) => {
     localStorage.setItem("token", token);
     localStorage.setItem("user", JSON.stringify(user));
-    set({ token, user }); // Esto ya sobrescribe ambos en el PATCH también
+    
+    // Esto ya sobrescribe ambos en el PATCH también
+    set({ token, user }); 
   },
 
   logout: () => {

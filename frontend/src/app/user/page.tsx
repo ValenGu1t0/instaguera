@@ -48,6 +48,10 @@ export default function UserPanelPage() {
 
         } else if (user) {
 
+        console.log(API_URL)
+        console.log(user)
+        console.log(token)
+
         // Si el usuario está logueado, podríamos cargar sus turnos
         // fetchUserTurns(user.id); // Implementa esta función si tienes un endpoint de turnos
         // Por ahora, simulamos datos de turnos
@@ -93,8 +97,6 @@ export default function UserPanelPage() {
         }
     }, [token, router, user, login]); 
 
-        console.log(API_URL)
-        console.log(user)
 
     
     // Actualiza al user con el nuevo patch
@@ -107,14 +109,17 @@ export default function UserPanelPage() {
 
     // Función para eliminar usuario
     const handleDeleteUser = async () => {
-    
+
         if (!user || !token) return;
+
+        console.log(token)
+        console.log(user);
 
         try {
             const res = await fetch(`${API_URL}/usuarios/${user.id}`, {
                 method: "DELETE",
                 headers: {
-                Authorization: `Bearer ${token}`,
+                    Authorization: `Bearer ${token}`,
                 },
         });
 
@@ -128,11 +133,11 @@ export default function UserPanelPage() {
         router.push("/");
 
         } catch (err) {
-        toast.error("Error al eliminar tu cuenta.");
-        console.error(err);
+            toast.error("Error al eliminar tu cuenta.");
+            console.error(err);
 
         } finally {
-        setIsDeleteDialogOpen(false);
+            setIsDeleteDialogOpen(false);
         }
     };
 
@@ -161,27 +166,24 @@ export default function UserPanelPage() {
                         <Info className="h-6 w-6 text-blue-400" /> Tus Datos
                         </CardTitle>
                         <CardDescription className="text-gray-300">
-                        Información de tu perfil.
+                            Información de tu perfil.
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-2">
                         <p>
-                        <strong className="text-blue-200">Nombre:</strong> {user.nombre}
+                            <strong className="text-blue-200">Nombre:</strong> {user.nombre}
                         </p>
                         <p>
-                        <strong className="text-blue-200">Apellido:</strong> {user.apellido}
+                            <strong className="text-blue-200">Apellido:</strong> {user.apellido}
                         </p>
                         <p>
-                        <strong className="text-blue-200">Username:</strong> {user.username}
+                            <strong className="text-blue-200">Username:</strong> {user.username}
                         </p>
                         <p>
-                        <strong className="text-blue-200">Email:</strong> {user.email}
+                            <strong className="text-blue-200">Email:</strong> {user.email}
                         </p>
                         <p>
-                        <strong className="text-blue-200">Celular:</strong> {user.celular}
-                        </p>
-                        <p>
-                        <strong className="text-blue-200">Rol:</strong> {user.role}
+                            <strong className="text-blue-200">Celular:</strong> {user.celular}
                         </p>
                     </CardContent>
                 </Card>
