@@ -27,9 +27,13 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(csrf -> csrf.disable())
-                .cors(cors -> {})
+                .cors(cors -> {}) // Aquí usará el corsConfigurer que definiste
                 .authorizeHttpRequests(auth -> auth
+                        // 1. Permite el acceso a /auth/** sin autenticación (más específico)
                         .requestMatchers("/auth/**").permitAll()
+                        // 2. Permite el acceso a /api/turnos/** a usuarios autenticados (específico)
+                        .requestMatchers("/api/turnos/**").authenticated() // Mueve esta línea aquí
+                        // 3. Cualquier otra solicitud DEBE estar autenticada (más general)
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

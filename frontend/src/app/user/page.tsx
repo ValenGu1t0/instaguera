@@ -35,7 +35,7 @@ export default function UserPanelPage() {
     const router = useRouter();
     const { user, token, logout, login } = useAuthStore();
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-    const [isDeleteUserDialogOpen, setIsDeleteUserDialogOpen] = useState(false); // Renombrado para claridad
+    const [isDeleteUserDialogOpen, setIsDeleteUserDialogOpen] = useState(false); 
     const [userTurns, setUserTurns] = useState<Turno[]>([]);
     const [loadingTurns, setLoadingTurns] = useState(true);
 
