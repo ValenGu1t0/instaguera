@@ -17,8 +17,6 @@ export default function NavBar() {
   const router = useRouter();
   const { token, user, logout } = useAuthStore();
 
-  console.log(token);
-
   let turnosHref = "/login";
   let turnosLabel = "Turnos";
 

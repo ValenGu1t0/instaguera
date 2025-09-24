@@ -21,14 +21,14 @@ import {
   DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { UserRoundPen, Trash2, CalendarCheck, Info, Plus } from "lucide-react";
+import { UserRoundPen, Trash2, CalendarCheck, Info, Plus, LogOut } from "lucide-react";
 import UserEditForm from "./UserEditForm"; 
 import Link from "next/link";
 import TurnoForm from "./TurnoForm";
 import { Usuario, Turno } from "@/types"; 
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
-const TATUADOR_ID = 1; // ID constante del tatuador único
+const TATUADOR_ID = 1; // thiago xd
 
 export default function UserPanelPage() {
 
@@ -241,6 +241,13 @@ export default function UserPanelPage() {
         return diffHours >= 48;
     };
 
+    // Logout desde panel de usuario
+    const handleLogout = () => {
+        toast.error("Usuario deslogueado!")
+        logout(); 
+        router.push("/");
+    };
+
     if (!user) {
         return (
             <div className="flex justify-center items-center h-screen text-2xl bg-gradient-to-br from-gray-900 to-black text-white">
@@ -253,10 +260,21 @@ export default function UserPanelPage() {
         <div className="flex min-h-screen flex-col items-center bg-gradient-to-br from-gray-900 to-black text-white">
 
             <header className="w-full p-6 bg-gray-700 flex flex-row justify-between items-center">
-                <Link href="/"><h2 className="text-2xl font-semibold italic text-indigo-400">Instaguera</h2></Link>
+                <Link href="/"><h2 className="text-2xl font-semibold italic text-indigo-500 hover:text-indigo-300 transition">Instaguera</h2></Link>
+
+                <Button
+                    variant="ghost"
+                    size="icon" 
+                    onClick={handleLogout}
+                    className="text-white hover:bg-white/20 hover:text-red-400 cursor-pointer"
+                    title="Cerrar Sesión" 
+                >
+                    <LogOut className="h-7 w-7" />
+                </Button>
             </header>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full max-w-[calc(100%-4rem)] px-8 mt-8"> {/* Ajuste de max-w y px */}
+            {/* Cards del Usuario */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full max-w-4/5 px-8 mt-8"> {/* Ajuste de max-w y px */}
 
                 {/* Información de Usuario (EXISTENTE) */}
                 <Card className="bg-opacity-10 bg-gray-600 backdrop-filter backdrop-blur-lg border border-indigo-700 text-white shadow-lg">
@@ -300,8 +318,8 @@ export default function UserPanelPage() {
                     <CardContent className="flex flex-col gap-4">
                         <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
                             <DialogTrigger asChild>
-                                <Button className="w-full bg-indigo-600 hover:bg-indigo-800 text-white flex items-center gap-2 cursor-pointer">
-                                    <UserRoundPen className="h-4 w-4" /> Modificar Perfil
+                                <Button className="w-full font-semibold bg-indigo-600 hover:bg-indigo-800 text-white flex items-center gap-2 cursor-pointer">
+                                    <UserRoundPen className="h-4 w-4 font-semibold" /> Modificar Perfil
                                 </Button>
                             </DialogTrigger>
                             <DialogContent className="sm:max-w-[425px] bg-gray-900 border-gray-700 text-white">
@@ -324,10 +342,10 @@ export default function UserPanelPage() {
                             <DialogTrigger asChild>
                                 <Button
                                     variant="destructive"
-                                    className="w-full bg-red-700 hover:bg-red-800 text-white flex items-center gap-2 cursor-pointer"
+                                    className="w-full font-semibold bg-red-700 hover:bg-red-800 text-white flex items-center gap-2 cursor-pointer"
                                     onClick={() => setIsDeleteUserDialogOpen(true)} 
                                 >
-                                    <Trash2 className="h-4 w-4" /> Eliminar Cuenta
+                                    <Trash2 className="h-4 w-4 font-semibold" /> Eliminar Cuenta
                                 </Button>
                             </DialogTrigger>
 
@@ -361,9 +379,12 @@ export default function UserPanelPage() {
 
             </div>
 
-            {/* Turnos Programados (MODIFICADO) */}
-            <div className="w-full my-8 max-w-[calc(100%-4rem)] px-8">
-                <Card className="bg-opacity-10 bg-gray-600 backdrop-filter backdrop-blur-lg border-2 border-indigo-700 text-white shadow-lg">
+            {/* Turnos del Usuario */}
+            <div className="w-full my-8 max-w-4/5 px-8">
+
+                {/* Card de Turno */}
+                <Card className="bg-opacity-10 bg-gray-600 backdrop-filter backdrop-blur-lg border-2 border-indigo-700 text-white shadow-2xl">
+                    
                     <CardHeader>
                         <CardTitle className="text-2xl font-bold text-gray-100 flex items-center gap-2">
                             <CalendarCheck className="h-6 w-6 text-green-400" /> Tus Próximos Turnos
@@ -372,11 +393,13 @@ export default function UserPanelPage() {
                             Aquí puedes ver y gestionar tus citas para tatuajes.
                         </CardDescription>
                     </CardHeader>
+
                     <CardContent className="space-y-4">
                         {loadingTurns ? (
                             <p className="text-gray-400">Cargando turnos...</p>
                         ) : (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
                                 {/* Card para sacar un nuevo turno (card fantasma) */}
                                 <Card
                                     className="bg-gray-800 border-gray-600 text-white p-4 flex flex-col justify-center items-center transition-transform hover:scale-105 duration-200 cursor-pointer h-48"
@@ -388,7 +411,7 @@ export default function UserPanelPage() {
 
                                 {/* Renderizado de los turnos existentes */}
                                 {userTurns.length === 0 && !loadingTurns ? (
-                                    // Este mensaje se mostrará si no hay turnos y ya terminaron de cargar
+                                    // Este mensaje se muestra si no hay turnos y ya terminaron de cargar
                                     <p className="text-gray-400 col-span-full">No tienes turnos programados. ¡Saca uno nuevo!</p>
                                 ) : (
                                     userTurns.map((turno) => {
@@ -396,22 +419,22 @@ export default function UserPanelPage() {
                                         return (
                                             <Card
                                                 key={turno.id}
-                                                className="bg-gray-800 border-gray-600 text-white p-4 transition-transform hover:scale-105 duration-200 relative"
+                                                className="bg-gray-800 border-gray-600 text-white p-6 transition-transform hover:scale-105 duration-200 relative"
                                             >
-                                                <CardTitle className="text-xl text-blue-300 mb-2">
-                                                    {turno.descripcion}
+                                                <CardTitle className="text-xl text-blue-500 mb-2">
+                                                    Artista: Thiago Reis
                                                 </CardTitle>
-                                                <CardDescription className="text-gray-400">
-                                                    Artista: {turno.dueno?.nombre || "N/A"} {turno.dueno?.apellido || ""}
+                                                <CardDescription className="text-gray-200 text-md">
+                                                    {turno.descripcion}
                                                 </CardDescription>
-                                                <p className="mt-2 text-sm">
-                                                    <strong className="text-gray-300">Fecha y Hora:</strong>{" "}
+                                                <p className="mt-2 text-lg">
+                                                    <strong className="text-gray-300 sm:text-lg">Fecha y Hora:</strong>{" "}
                                                     {new Date(turno.fechaHora).toLocaleString()}
                                                 </p>
                                                 <p className="text-sm">
-                                                    <strong className="text-gray-300">Estado:</strong>{" "}
+                                                    <strong className="text-gray-300 sm:text-md">Estado:</strong>{" "}
                                                     <span
-                                                        className={`font-semibold ${
+                                                        className={`font-semibold sm:text-md ${
                                                             turno.estado === "CONFIRMADO"
                                                                 ? "text-green-400"
                                                                 : turno.estado === "SOLICITADO"
@@ -429,10 +452,10 @@ export default function UserPanelPage() {
                                                             variant="ghost"
                                                             size="icon"
                                                             onClick={(e) => {
-                                                                e.stopPropagation(); // Evita que se dispare el click de la card
+                                                                e.stopPropagation(); 
                                                                 handleOpenEditTurno(turno);
                                                             }}
-                                                            className="text-gray-400 hover:text-indigo-400"
+                                                            className="text-gray-400 hover:text-indigo-400 cursor-pointer"
                                                             title="Editar Turno"
                                                         >
                                                             <UserRoundPen className="h-4 w-4" />
@@ -445,7 +468,7 @@ export default function UserPanelPage() {
                                                                 setDeletingTurnoId(turno.id); // Establece el turno a eliminar
                                                                 setIsDeleteUserDialogOpen(true); // Abre el diálogo de confirmación
                                                             }}
-                                                            className="text-gray-400 hover:text-red-400"
+                                                            className="text-gray-400 hover:text-red-400 cursor-pointer"
                                                             title="Eliminar Turno"
                                                         >
                                                             <Trash2 className="h-4 w-4" />
@@ -458,11 +481,13 @@ export default function UserPanelPage() {
                                 )}
                             </div>
                         )}
+                    
                     </CardContent>
                 </Card>
+
             </div>
 
-            {/* Diálogo para Crear/Editar Turno (MODAL) */}
+            {/* Modal para Crear/Editar */}
             <Dialog open={isTurnoFormOpen} onOpenChange={setIsTurnoFormOpen}>
                 <DialogContent className="sm:max-w-[425px] bg-gray-900 border-gray-700 text-white">
                     <DialogHeader>
@@ -475,12 +500,12 @@ export default function UserPanelPage() {
                         initialData={editingTurno}
                         onSubmitSuccess={handleCreateUpdateTurno}
                         onClose={() => setIsTurnoFormOpen(false)}
-                        canModifyTurno={canModifyTurno} // Pasamos la función al TurnoForm
+                        canModifyTurno={canModifyTurno}
                     />
                 </DialogContent>
             </Dialog>
 
-            {/* Diálogo de Confirmación para Eliminar Turno Específico */}
+            {/* Modal de Eliminar Turno */}
             <Dialog open={deletingTurnoId !== null && isDeleteUserDialogOpen} onOpenChange={(open) => {
                 setIsDeleteUserDialogOpen(open);
                 if (!open) setDeletingTurnoId(null); // Limpiar si se cierra el diálogo

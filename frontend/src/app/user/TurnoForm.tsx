@@ -122,10 +122,10 @@ export default function TurnoForm({ initialData, onSubmitSuccess, onClose, canMo
                 </div>
             )}
             <div className="flex justify-end gap-2 pt-4">
-                <Button type="button" variant="outline" onClick={onClose} className="text-white hover:bg-gray-700">
+                <Button type="button" variant="outline" onClick={onClose} className="text-white hover:bg-gray-700 cursor-pointer">
                     Cancelar
                 </Button>
-                <Button type="submit" className="bg-indigo-600 hover:bg-indigo-800 text-white">
+                <Button type="submit" className="bg-indigo-600 hover:bg-indigo-800 text-white cursor-pointer">
                     {initialData ? "Guardar Cambios" : "Sacar Turno"}
                 </Button>
             </div>

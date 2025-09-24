@@ -5,12 +5,12 @@ import { Toaster } from "sonner";
 
 const roboto = Roboto({
   subsets: ["latin"],
-  weight: ["400", "600", "700"], // pesos que necesites
+  weight: ["400", "600", "700"],
   variable: "--font-roboto", 
 });
 
 export const metadata: Metadata = {
-  title: "Instaguera - Rosario",
+  title: "Instaguera",
   description: "Tatuajes de calidad en Rosario.",
 };
 
