@@ -26,19 +26,19 @@ import TurnoAdminForm from "./TurnoAdminForm";
 import { Turno } from "@/types"; 
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
-const TATUADOR_ID = 1; // ID constante del tatuador único (Thiago xd)
+const TATUADOR_ID = 1;
 
 export default function AdminPanelPage() {
 
     const router = useRouter();
     const { user, token, logout } = useAuthStore();
-    const [allTurns, setAllTurns] = useState<Turno[]>([]); // Para almacenar TODOS los turnos
+    const [allTurns, setAllTurns] = useState<Turno[]>([]); 
     const [loadingTurns, setLoadingTurns] = useState(true);
 
     const [isTurnoFormOpen, setIsTurnoFormOpen] = useState(false); 
     const [editingTurno, setEditingTurno] = useState<Turno | null>(null); 
     const [deletingTurnoId, setDeletingTurnoId] = useState<number | null>(null);
-    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false); // Diálogo de eliminación de turno
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false); 
 
     // Función para obtener TODOS los turnos (para el admin)
     const fetchAllTurns = useCallback(async () => {
@@ -233,9 +233,9 @@ export default function AdminPanelPage() {
             </header>
 
             {/* Panel de Turnos del Administrador */}
-            <div className="w-full my-8 max-w-4/5 px-8">
+            <div className="w-full my-8 max-w-[95%] px-8">
 
-                <Card className="bg-opacity-10 bg-gray-600 backdrop-filter backdrop-blur-lg border-2 border-indigo-700 text-white shadow-2xl">
+                <Card className="bg-opacity-10 bg-gray-500 backdrop-filter backdrop-blur-lg border-2 border-indigo-700 text-white shadow-2xl">
                     
                     <CardHeader>
                         <CardTitle className="text-2xl font-bold text-gray-100 flex items-center gap-2">
@@ -268,7 +268,7 @@ export default function AdminPanelPage() {
                                     allTurns.map((turno) => (
                                         <Card
                                             key={turno.id}
-                                            className="bg-gray-800 border-gray-600 text-white p-6 transition-transform hover:scale-105 duration-200 relative"
+                                            className="bg-gray-800 border-gray-600 text-white p-8 transition-transform hover:scale-105 duration-200 relative"
                                         >
                                             <CardTitle className="text-xl text-blue-500 mb-2">
                                                 Cliente: {turno.cliente?.nombre || "N/A"} {turno.cliente?.apellido || ""}

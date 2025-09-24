@@ -1,11 +1,58 @@
+"use client"
+
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Input } from "@/components/ui/input"; // Se mantiene para el campo de cliente
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Turno, Usuario } from "@/types"; 
+import { Turno, Usuario } from "@/types";
 import { toast } from "sonner";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
+import { Calendar } from "@/components/ui/calendar";
+
+// Nuevo TimePicker usando Select de shadcn
+interface TimePickerProps {
+    value: string;
+    onChange: (time: string) => void;
+    disabled?: boolean;
+}
+
+// Generador de horarios entre 09:00 y 20:00 en saltos de 15 minutos
+const generateTimeOptions = () => {
+    const options: string[] = [];
+    for (let hour = 9; hour <= 20; hour++) {
+        for (const minutes of [0, 15, 30, 45]) {
+            if (hour === 20 && minutes > 0) break;
+            const h = hour.toString().padStart(2, "0");
+            const m = minutes.toString().padStart(2, "0");
+            options.push(`${h}:${m}`);
+        }
+    }
+    return options;
+};
+
+const timeOptions = generateTimeOptions();
+
+const TimePicker: React.FC<TimePickerProps> = ({ value, onChange, disabled }) => {
+    return (
+        <Select value={value} onValueChange={onChange} disabled={disabled}>
+            <SelectTrigger className="w-full bg-gray-800 border-gray-600 text-white">
+                <SelectValue placeholder="Selecciona una hora" />
+            </SelectTrigger>
+            <SelectContent className="bg-gray-800 border-gray-600 text-white max-h-60">
+                {timeOptions.map((t) => (
+                    <SelectItem key={t} value={t}>
+                        {t}
+                    </SelectItem>
+                ))}
+            </SelectContent>
+        </Select>
+    );
+};
 
 interface TurnoAdminFormProps {
     initialData?: Turno | null;
@@ -15,52 +62,55 @@ interface TurnoAdminFormProps {
 
 export default function TurnoAdminForm({ initialData, onSubmitSuccess, onClose }: TurnoAdminFormProps) {
 
-    const [fechaHora, setFechaHora] = useState("");
+    const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+    const [selectedTime, setSelectedTime] = useState<string>("");
     const [descripcion, setDescripcion] = useState("");
-    const [estado, setEstado] = useState<Turno['estado']>("SOLICITADO"); 
-    const [clienteId, setClienteId] = useState<number | null>(null); // Para mostrar/establecer cliente si es necesario
+    const [estado, setEstado] = useState<Turno['estado']>("SOLICITADO");
+    const [clienteId, setClienteId] = useState<number | null>(null);
 
     useEffect(() => {
         if (initialData) {
-            setFechaHora(initialData.fechaHora.substring(0, 16)); 
+            const initialDate = new Date(initialData.fechaHora);
+            setSelectedDate(initialDate);
+            setSelectedTime(format(initialDate, "HH:mm"));
             setDescripcion(initialData.descripcion);
             setEstado(initialData.estado);
             setClienteId(initialData.cliente?.id || null);
         } else {
-            // Limpiar formulario para un nuevo turno
-            setFechaHora("");
+            setSelectedDate(undefined);
+            setSelectedTime("");
             setDescripcion("");
-            setEstado("SOLICITADO"); // Un nuevo turno puede iniciar como 'SOLICITADO' por defecto
-            setClienteId(null);
+            setEstado("SOLICITADO");
+            setClienteId(null);                                     
         }
     }, [initialData]);
 
-
+    // POST Turno del tatuador
     const handleSubmit = (e: React.FormEvent) => {
+
         e.preventDefault();
 
-        if (!fechaHora || !descripcion) {
+        if (!selectedDate || !selectedTime || !descripcion) {
             toast.error("Por favor, completa la fecha, hora y descripción.");
             return;
         }
 
-        // El admin puede modificar la fecha sin la restricción de 48h del cliente.
-        // También puede cambiar el estado.
+        const [hours, minutes] = selectedTime.split(":").map(Number);
+        const fullFechaHora = new Date(selectedDate);
+        fullFechaHora.setHours(hours, minutes, 0, 0);
 
         onSubmitSuccess({
-            fechaHora: new Date(fechaHora).toISOString(), 
+            fechaHora: fullFechaHora.toISOString(),
             descripcion,
-            estado, // El admin puede definir o cambiar el estado
-            // Si el admin tuviera un selector para asignar el turno a un cliente:
-            cliente: clienteId ? { id: clienteId } as Usuario : initialData?.cliente, // Mantener el cliente existente o asignar uno nuevo
-            // El dueño sigue siendo el tatuador único, no se necesita enviar desde aquí
+            estado,
+            cliente: clienteId ? { id: clienteId } as Usuario : initialData?.cliente,
         });
     };
-    
+
     return (
         <form onSubmit={handleSubmit} className="space-y-4">
             {initialData && initialData.cliente && (
-                 <div className="grid gap-2">
+                <div className="grid gap-2">
                     <Label htmlFor="clienteInfo" className="text-gray-300">Cliente</Label>
                     <Input
                         id="clienteInfo"
@@ -72,19 +122,44 @@ export default function TurnoAdminForm({ initialData, onSubmitSuccess, onClose }
                 </div>
             )}
             <div className="grid gap-2">
-                <Label htmlFor="fechaHora" className="text-gray-300">Fecha y Hora</Label>
-                <Input
-                    id="fechaHora"
-                    type="datetime-local"
-                    value={fechaHora}
-                    onChange={(e) => setFechaHora(e.target.value)}
-                    required
-                    className="bg-gray-800 border-gray-600 text-white"
-                    // El admin no tiene la restricción de 48h para la fecha
-                    // Min date podría ser hoy, o no tener mínimo para turnos pasados
-                    min={new Date().toISOString().substring(0, 16)} 
-                />
+                <Label htmlFor="fecha" className="text-gray-300">
+                    Fecha
+                </Label>
+                <Popover>
+                    <PopoverTrigger asChild>
+                        <Button
+                            variant={"outline"}
+                            className={`w-full justify-start text-left font-normal ${
+                                !selectedDate && "text-muted-foreground"
+                            } bg-gray-800 border-gray-600 text-white`}
+                        >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {selectedDate ? (
+                                format(selectedDate, "PPP", { locale: es })
+                            ) : (
+                                <span>Selecciona una fecha</span>
+                            )}
+                        </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0 bg-gray-800 border-gray-700">
+                        <Calendar
+                            mode="single"
+                            selected={selectedDate}
+                            onSelect={setSelectedDate}
+                            initialFocus
+                            locale={es}
+                        />
+                    </PopoverContent>
+                </Popover>
             </div>
+
+            <div className="grid gap-2">
+                <Label htmlFor="hora" className="text-gray-300">
+                    Hora
+                </Label>
+                <TimePicker value={selectedTime} onChange={setSelectedTime} />
+            </div>
+
             <div className="grid gap-2">
                 <Label htmlFor="descripcion" className="text-gray-300">Descripción del Tatuaje</Label>
                 <Textarea
@@ -100,8 +175,7 @@ export default function TurnoAdminForm({ initialData, onSubmitSuccess, onClose }
                 <Label htmlFor="estado" className="text-gray-300">Estado del Turno</Label>
                 <Select
                     onValueChange={(value: Turno['estado']) => setEstado(value)}
-                    value={estado}
-                    // El admin SÍ puede cambiar el estado
+                    value={estado} 
                 >
                     <SelectTrigger className="w-full bg-gray-800 border-gray-600 text-white">
                         <SelectValue placeholder="Estado del Turno" />
@@ -115,10 +189,10 @@ export default function TurnoAdminForm({ initialData, onSubmitSuccess, onClose }
                 </Select>
             </div>
             <div className="flex justify-end gap-2 pt-4">
-                <Button type="button" variant="outline" onClick={onClose} className="text-white hover:bg-gray-700">
+                <Button type="button" variant="outline" onClick={onClose} className="text-white hover:bg-gray-700 cursor-pointer">
                     Cancelar
                 </Button>
-                <Button type="submit" className="bg-indigo-600 hover:bg-indigo-800 text-white">
+                <Button type="submit" className="bg-indigo-600 hover:bg-indigo-800 text-white cursor-pointer">
                     {initialData ? "Guardar Cambios" : "Crear Turno"}
                 </Button>
             </div>
