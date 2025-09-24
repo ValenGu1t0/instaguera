@@ -76,15 +76,15 @@ export default function NavBar() {
       items-center`}
     >
       {/* Logo */}
-      <Link href="/" className="text-xl font-semibold italic text-white hidden sm:flex">
+      <Link href="/" className="text-xl font-semibold italic text-white hidden lg:flex">
         Instaguera
       </Link>
 
       {/* Links */}
       <ul className="w-full flex items-center justify-evenly gap-4 sm:gap-6 font-semibold text-white">
-        <li><Link href="/" className="hover:text-indigo-500 transition text-md md:text-lg">Inicio</Link></li>
-        <li className="hidden sm:flex"><Link href="#tattoos" className="hover:text-indigo-500 transition text-md md:text-lg">Tattoos</Link></li>
-        <li><Link href={turnosHref} className="hover:text-indigo-500 transition text-md md:text-lg">{turnosLabel}</Link></li>
+        <li><Link href="#inicio" className="hover:text-indigo-500 transition text-sm sm:text-lg">Inicio</Link></li>
+        <li><Link href="#tattoos" className="hover:text-indigo-500 transition text-sm sm:text-lg">Tattoos</Link></li>
+        <li><Link href={turnosHref} className="hover:text-indigo-500 transition text-sm sm:text-lg">{turnosLabel}</Link></li>
       </ul>
 
       {/* Ícono de usuario / logout */}
@@ -96,7 +96,7 @@ export default function NavBar() {
             variant="ghost"
             size="icon" 
             onClick={handleLogout}
-            className="text-white hover:bg-white/20 hover:text-red-400 cursor-pointer"
+            className="hidden md:flex text-white hover:bg-white/20 hover:text-red-400 cursor-pointer"
             title="Cerrar Sesión" 
           >
             <LogOut className="h-5 w-5" />

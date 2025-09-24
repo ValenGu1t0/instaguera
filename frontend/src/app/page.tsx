@@ -6,15 +6,13 @@ export default function Home() {
 
   return (
 
-    <div className="min-h-screen mt-32 ">
+    <div className="min-h-screen mt-24 sm:mt-28 font-montserrat">
+
+      <div id="inicio"></div>
 
       <NavBar />
-      
-      <Hero />
 
-      <div className="p-20 my-12 sm:my-20 flex flex-row items-center justify-center bg-gradient-to-br from-gray-900 to-black font-semibold text-4xl">
-        <h2 className="text-center text-white">ÚLTIMOS TATUAJES</h2>
-      </div>
+      <Hero />
 
       <GridTatuajes />
 

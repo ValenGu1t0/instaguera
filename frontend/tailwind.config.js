@@ -9,7 +9,9 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["var(--font-roboto)", "sans-serif"],
+        /* sans: ["var(--font-roboto)", "sans-serif"], */
+        montserrat: ["var(--font-montserrat)"],
+        tattoo: ["var(--font-great-vibes)"],
       },
     },
   },
