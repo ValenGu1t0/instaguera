@@ -22,7 +22,7 @@ export default function NavBar() {
 
   if (token) {
     if (user?.role === "ADMIN"  || user?.role === "DUENO") {
-      turnosHref = "/admin/turnos";
+      turnosHref = "/admin";
       turnosLabel = "Gestión";
 
     } else if (user?.role === "CLIENTE") {
