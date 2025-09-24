@@ -65,23 +65,27 @@ export default function TurnoAdminForm({ initialData, onSubmitSuccess, onClose }
     const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
     const [selectedTime, setSelectedTime] = useState<string>("");
     const [descripcion, setDescripcion] = useState("");
-    const [estado, setEstado] = useState<Turno['estado']>("SOLICITADO");
+    const [estado, setEstado] = useState<Turno['estado']>("SOLICITADO"); // Default inicial para el estado si no hay initialData
     const [clienteId, setClienteId] = useState<number | null>(null);
 
     useEffect(() => {
         if (initialData) {
+            // Modo edición: cargar datos del turno existente
             const initialDate = new Date(initialData.fechaHora);
             setSelectedDate(initialDate);
-            setSelectedTime(format(initialDate, "HH:mm"));
+            setSelectedTime(format(initialDate, "HH:mm")); // Precarga la hora del turno existente
             setDescripcion(initialData.descripcion);
-            setEstado(initialData.estado);
+            setEstado(initialData.estado); // Precarga el estado del turno existente
             setClienteId(initialData.cliente?.id || null);
         } else {
-            setSelectedDate(undefined);
-            setSelectedTime("");
+            // Modo creación: establecer valores por defecto
+            // Precargar la fecha para "hoy" o un día por defecto
+            setSelectedDate(new Date()); // Precarga el día actual como fecha por defecto
+            // Precargar una hora por defecto si se está creando un nuevo turno
+            setSelectedTime("10:00"); // Puedes cambiar "10:00" por la hora que desees como default
             setDescripcion("");
-            setEstado("SOLICITADO");
-            setClienteId(null);                                     
+            setEstado("SOLICITADO"); // Precarga el estado a "SOLICITADO" por defecto en creación
+            setClienteId(null);
         }
     }, [initialData]);
 

@@ -34,19 +34,21 @@ export default function AdminPanelPage() {
     const { user, token, logout } = useAuthStore();
     const [allTurns, setAllTurns] = useState<Turno[]>([]); 
     const [loadingTurns, setLoadingTurns] = useState(true);
-
     const [isTurnoFormOpen, setIsTurnoFormOpen] = useState(false); 
     const [editingTurno, setEditingTurno] = useState<Turno | null>(null); 
     const [deletingTurnoId, setDeletingTurnoId] = useState<number | null>(null);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false); 
 
-    // Función para obtener TODOS los turnos (para el admin)
+    // GET de TODOS los turnos para el admin
     const fetchAllTurns = useCallback(async () => {
+
         if (!token) {
             setLoadingTurns(false);
             return;
         }
+
         setLoadingTurns(true);
+
         try {
             const res = await fetch(`${API_URL}/turnos`, { // Este endpoint debería devolver TODOS los turnos
                 headers: {
@@ -64,6 +66,7 @@ export default function AdminPanelPage() {
             }
 
             const turns: Turno[] = await res.json();
+            console.log(turns);
             setAllTurns(turns);
 
         } catch (error) {
