@@ -259,8 +259,11 @@ export default function UserPanelPage() {
     return (
         <div className="flex min-h-screen flex-col items-center bg-gradient-to-br from-gray-900 to-black text-white">
 
-            <header className="w-full p-6 bg-gray-700 flex flex-row justify-between items-center">
-                <Link href="/"><h2 className="text-2xl font-semibold italic text-indigo-500 hover:text-indigo-300 transition">Instaguera</h2></Link>
+            <header className="w-full px-8 py-6 bg-gray-700 flex flex-row justify-between items-center">
+                
+                <Link href="/"><h2 className="text-2xl text-white hover:text-indigo-400 transition">Inicio</h2></Link>
+
+                <h3 className="text-3xl text-white ">Panel de Usuario</h3>
 
                 <Button
                     variant="ghost"

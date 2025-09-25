@@ -202,8 +202,8 @@ export default function AdminPanelPage() {
     // Logout desde panel de admin
     const handleLogout = () => {
         toast.error("Sesión de administrador cerrada!");
-        logout(); 
         router.push("/");
+        logout(); 
     };
 
     if (!user || (!["ADMIN", "DUENO"].includes(user.role))) {
@@ -218,27 +218,27 @@ export default function AdminPanelPage() {
     return (
         <div className="flex min-h-screen flex-col items-center bg-gradient-to-br from-gray-900 to-black text-white">
 
-            <header className="w-full p-6 bg-gray-700 flex flex-row justify-between items-center">
-                <Link href="/"><h2 className="text-2xl font-semibold italic text-indigo-500 hover:text-indigo-300 transition">Instaguera</h2></Link>
+            <header className="w-full px-8 py-6 bg-gray-700 flex flex-row justify-between items-center">
                 
-                <div className="flex items-center gap-4">
-                    <span className="text-gray-300 text-sm hidden sm:block">Bienvenido, {user.nombre} ({user.role})</span>
-                    <Button
-                        variant="ghost"
-                        size="icon" 
-                        onClick={handleLogout}
-                        className="text-white hover:bg-white/20 hover:text-red-400 cursor-pointer"
-                        title="Cerrar Sesión" 
-                    >
-                        <LogOut className="h-7 w-7" />
-                    </Button>
-                </div>
+                <Link href="/"><h2 className="text-2xl text-white hover:text-indigo-400 transition">Inicio</h2></Link>
+
+                <h3 className="text-3xl text-white ">Panel Tatuador</h3>
+
+                <Button
+                    variant="ghost"
+                    size="icon" 
+                    onClick={handleLogout}
+                    className="text-white hover:bg-white/20 hover:text-red-400 cursor-pointer"
+                    title="Cerrar Sesión" 
+                >
+                    <LogOut className="h-7 w-7" />
+                </Button>
             </header>
 
             {/* Panel de Turnos del Administrador */}
             <div className="w-full my-8 max-w-[95%] px-8">
 
-                <Card className="bg-opacity-10 bg-gray-500 backdrop-filter backdrop-blur-lg border-2 border-indigo-700 text-white shadow-2xl">
+                <Card className="bg-opacity-10 bg-gray-700 backdrop-filter backdrop-blur-lg border-2 border-indigo-600 text-white shadow-2xl">
                     
                     <CardHeader>
                         <CardTitle className="text-2xl font-bold text-gray-100 flex items-center gap-2">

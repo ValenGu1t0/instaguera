@@ -60,7 +60,7 @@ export default function Contacto() {
             <p className="text-gray-300 max-w-md md:ml-auto">
                 Creá tu cuenta y reservá un turno online. Es rápido y fácil para que no tengas que esperar.
             </p>
-            <Link href="/register" className="bg-indigo-600 hover:bg-gray-200 text-black font-semibold px-8 py-3 rounded-2xl shadow-md hover:scale-105 transition cursor-pointer">
+            <Link href="/register" className="bg-indigo-500 hover:bg-gray-200 text-indigo-950 font-semibold px-4 py-3 md:px-8 md:py-3 rounded-2xl shadow-md hover:scale-105 transition cursor-pointer">
                 Crear cuenta y sacar turno
             </Link>
         </div>
