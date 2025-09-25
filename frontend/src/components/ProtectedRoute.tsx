@@ -24,7 +24,7 @@ export default function ProtectedRoute({ children, roles }: ProtectedRouteProps)
         }
 
         if (roles && user && !roles.includes(user.role)) {
-        router.replace("/"); // o /403 si tenés una página de error
+        router.replace("/"); 
         return;
         }
 

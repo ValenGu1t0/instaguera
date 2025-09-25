@@ -40,7 +40,7 @@ export default function Register() {
                 username,
                 email,
                 password,
-                role: "CLIENTE", // Fijado como CLIENTE por defecto, según tu comentario
+                role: "CLIENTE",        // fijado en client
                 }),
             });
 
@@ -49,7 +49,7 @@ export default function Register() {
                 throw new Error(errorData.message || "Error al registrar usuario");
             }
 
-            // Podria mejorarlo a loguear automaticamente con el register..
+            // Podria mejorarlo a loguear automaticamente con el register.. ver desp
             toast.success("Usuario creado correctamente! Gracias por sumarte!")
             router.push("/login?success=true");
 

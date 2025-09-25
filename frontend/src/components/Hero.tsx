@@ -3,6 +3,7 @@ import Image from "next/image";
 export default function Hero() {
 
   return (
+    
     <section className="flex flex-col md:flex-row items-center justify-between min-h-screen px-12 md:px-16 bg-gradient-to-br from-gray-800 to-black">
       
       {/* Columna izquierda: Texto */}

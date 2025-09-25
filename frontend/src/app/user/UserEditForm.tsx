@@ -108,39 +108,39 @@ export default function UserEditForm({
             <div>
                 <Label htmlFor="edit-username" className="text-gray-700 dark:text-gray-100">Nombre de Usuario</Label>
                 <Input
-                id="edit-username"
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="nombredeusuario"
-                required
-                className="mt-1 bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 dark:focus:border-blue-500 focus:ring-blue-500 dark:focus:ring-blue-500"
+                    id="edit-username"
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    placeholder="nombredeusuario"
+                    required
+                    className="mt-1 bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 dark:focus:border-blue-500 focus:ring-blue-500 dark:focus:ring-blue-500"
                 />
             </div>
 
             <div>
                 <Label htmlFor="edit-celular" className="text-gray-700 dark:text-gray-100">Celular</Label>
                 <Input
-                id="edit-celular"
-                type="tel"
-                value={celular}
-                onChange={(e) => setCelular(e.target.value)}
-                placeholder="Ej: 3001234567"
-                required
-                className="mt-1 bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 dark:focus:border-blue-500 focus:ring-blue-500 dark:focus:ring-blue-500"
+                    id="edit-celular"
+                    type="tel"
+                    value={celular}
+                    onChange={(e) => setCelular(e.target.value)}
+                    placeholder="Ej: 3001234567"
+                    required
+                    className="mt-1 bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 dark:focus:border-blue-500 focus:ring-blue-500 dark:focus:ring-blue-500"
                 />
             </div>
 
             <div>
                 <Label htmlFor="edit-email" className="text-gray-700 dark:text-gray-100">Email</Label>
                 <Input
-                id="edit-email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="tu@ejemplo.com"
-                required
-                className="mt-1 bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 dark:focus:border-blue-500 focus:ring-blue-500 dark:focus:ring-blue-500"
+                    id="edit-email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="tu@ejemplo.com"
+                    required
+                    className="mt-1 bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 dark:focus:border-blue-500 focus:ring-blue-500 dark:focus:ring-blue-500"
                 />
             </div>
 

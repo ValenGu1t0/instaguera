@@ -46,6 +46,7 @@ export default function LoginPage() {
 
       console.log(data.token);
 
+      // Guardamos el token en el front
       login(data.token, data.user);
       toast.success("Usuario logueado correctamente!")
       router.push("/");             
@@ -66,6 +67,7 @@ export default function LoginPage() {
       
       <Card className="w-full p-2 my-16 max-w-md bg-opacity-10 bg-gray-700 backdrop-filter backdrop-blur-lg border border-gray-700 text-white shadow-lg">
         
+        {/* LOGIN */}
         <CardHeader className="text-center">
           <CardTitle className="text-3xl font-bold text-white">Iniciar Sesión</CardTitle>
           <CardDescription className="text-white">
@@ -148,7 +150,7 @@ export default function LoginPage() {
             </a>
           </p>
         </CardContent>
-      
+
       </Card>
     </div>
   );

@@ -50,16 +50,16 @@ export default function DuenoPanelPage() {
         setLoadingTurns(true);
 
         try {
-            const res = await fetch(`${API_URL}/turnos`, { // Este endpoint debería devolver TODOS los turnos
+            const res = await fetch(`${API_URL}/turnos`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
             });
 
             if (!res.ok) {
-                if (res.status === 403) { // Prohibido si no tiene rol de admin/dueno
+                if (res.status === 403) {
                     toast.error("No tienes permisos para acceder a esta página.");
-                    router.push("/"); // Redirigir a la página principal
+                    router.push("/"); 
                     return;
                 }
                 throw new Error("Error al cargar los turnos.");
@@ -73,6 +73,7 @@ export default function DuenoPanelPage() {
             toast.error("Hubo un error al cargar todos los turnos.");
             console.error("Error fetching all turns:", error);
             setAllTurns([]);
+
         } finally {
             setLoadingTurns(false);
         }
@@ -111,6 +112,7 @@ export default function DuenoPanelPage() {
 
     // SUBMIT POST / PATCH Turnos 
     const handleCreateUpdateTurno = async (turnoData: Partial<Turno>) => {
+
         if (!token || !user) {
             toast.error("No estás autenticado o no se pudo obtener tu información.");
             return;
@@ -119,6 +121,7 @@ export default function DuenoPanelPage() {
         try {
             let res;
             if (editingTurno) {
+
                 // Actualizar turno existente (el admin puede modificar más campos)
                 res = await fetch(`${API_URL}/turnos/${editingTurno.id}`, {
                     method: "PATCH",
@@ -129,18 +132,14 @@ export default function DuenoPanelPage() {
                     body: JSON.stringify({
                         descripcion: turnoData.descripcion,
                         fechaHora: turnoData.fechaHora,
-                        estado: turnoData.estado, // El admin sí puede cambiar el estado
-                        // Cliente y dueño no se modifican desde aquí por el admin si no hay una necesidad explícita
-                        // Si hubiera varios tatuadores, aquí se podría permitir cambiar el 'dueno'.
-                        dueno: { id: TATUADOR_ID }, // Asegurar que el dueño es el tatuador único
-                        cliente: turnoData.cliente // Pasar el cliente si se recibe, para que el backend lo use
+                        estado: turnoData.estado, 
+                        dueno: { id: TATUADOR_ID }, 
+                        cliente: turnoData.cliente 
                     }),
                 });
+
             } else {
-                // Crear nuevo turno (el admin puede asignarlo a un cliente específico si tiene un select de clientes)
-                // Para simplificar, asumiremos que el admin crea turnos para el tatuador único
-                // y el cliente se especificaría si el formulario lo permite, o se dejaría nulo/por defecto.
-                // Aquí, si no se especifica cliente, lo haremos para el tatuador y luego se puede asignar.
+                
                 res = await fetch(`${API_URL}/turnos`, {
                     method: "POST",
                     headers: {
@@ -149,10 +148,8 @@ export default function DuenoPanelPage() {
                     },
                     body: JSON.stringify({
                         ...turnoData,
-                        dueno: { id: TATUADOR_ID }, // El dueño es el tatuador único y constante
-                        estado: turnoData.estado || "SOLICITADO", // Puede definir el estado inicial
-                        // Si el formulario de admin tuviera un selector de clientes, se agregaría aquí:
-                        // cliente: turnoData.cliente ? { id: turnoData.cliente.id } : null, 
+                        dueno: { id: TATUADOR_ID }, 
+                        estado: turnoData.estado || "SOLICITADO",
                     }),
                 });
             }
@@ -163,7 +160,7 @@ export default function DuenoPanelPage() {
             }
 
             toast.success(`Turno ${editingTurno ? 'actualizado' : 'creado'} exitosamente.`);
-            fetchAllTurns(); // Recargar TODOS los turnos
+            fetchAllTurns(); 
             setIsTurnoFormOpen(false); 
             
         } catch (error) {
@@ -174,6 +171,7 @@ export default function DuenoPanelPage() {
 
     // DELETE Turno
     const confirmDeleteTurno = async () => {
+
         if (!token || !deletingTurnoId) {
              toast.error("No estás autenticado o no hay un turno seleccionado para eliminar.");
              return;
@@ -296,7 +294,7 @@ export default function DuenoPanelPage() {
                                                             ? "text-yellow-400"
                                                             : turno.estado === "CANCELADO"
                                                             ? "text-red-400"
-                                                            : "text-blue-400" // Para 'COMPLETADO' u otros
+                                                            : "text-blue-400"
                                                     }`}
                                                 >
                                                     {turno.estado}
@@ -390,7 +388,6 @@ export default function DuenoPanelPage() {
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
-
         </div>
     );
 }

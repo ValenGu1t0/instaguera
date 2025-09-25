@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react"; // Importar useCallback
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/auth";
 import { toast } from "sonner";
@@ -38,8 +38,6 @@ export default function UserPanelPage() {
     const [isDeleteUserDialogOpen, setIsDeleteUserDialogOpen] = useState(false); 
     const [userTurns, setUserTurns] = useState<Turno[]>([]);
     const [loadingTurns, setLoadingTurns] = useState(true);
-
-    // Estados específicos para la gestión de turnos
     const [isTurnoFormOpen, setIsTurnoFormOpen] = useState(false); 
     const [editingTurno, setEditingTurno] = useState<Turno | null>(null); 
     const [deletingTurnoId, setDeletingTurnoId] = useState<number | null>(null);
@@ -52,10 +50,8 @@ export default function UserPanelPage() {
         }
         setLoadingTurns(true);
         try {
-            // Se asume que el backend tiene un endpoint para obtener turnos por cliente,
-            // o que el endpoint /turnos permite filtrar por cliente si es admin.
-            // Por ahora, mantenemos el filtrado en frontend si el endpoint general devuelve todos.
-            const res = await fetch(`${API_URL}/turnos?clienteId=${userId}`, { // Endpoint ideal: /turnos?clienteId={userId}
+           
+            const res = await fetch(`${API_URL}/turnos?clienteId=${userId}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -66,8 +62,6 @@ export default function UserPanelPage() {
             }
 
             const allTurns: Turno[] = await res.json();
-            // Filtrar en frontend si el endpoint anterior no soporta filtrado por cliente
-            // Si el backend ya filtra por cliente, esta línea no sería estrictamente necesaria
             const userSpecificTurns = allTurns.filter(turno => turno.cliente?.id === userId); 
             setUserTurns(userSpecificTurns);
 
@@ -75,10 +69,11 @@ export default function UserPanelPage() {
             toast.error("Hubo un error al cargar tus turnos.");
             console.error("Error fetching user turns:", error);
             setUserTurns([]);
+
         } finally {
             setLoadingTurns(false);
         }
-    }, [token]); // token como dependencia
+    }, [token]);
 
     // useEffect para la autenticación y carga de turnos
     useEffect(() => {
@@ -93,7 +88,7 @@ export default function UserPanelPage() {
             }
         }
 
-    }, [token, router, user, fetchUserTurns]); // fetchUserTurns como dependencia
+    }, [token, router, user, fetchUserTurns]);
 
 
     // Actualiza al user con el nuevo patch (existente)
@@ -106,6 +101,7 @@ export default function UserPanelPage() {
 
     // DELETE Usuario (existente)
     const handleDeleteUser = async () => {
+
         if (!user || !token) return;
 
         try {
@@ -127,14 +123,15 @@ export default function UserPanelPage() {
         } catch (err) {
             toast.error("Error al eliminar tu cuenta.");
             console.error(err);
+
         } finally {
-            setIsDeleteUserDialogOpen(false); // Usar el nuevo estado
+            setIsDeleteUserDialogOpen(false); 
         }
     };
 
     // Abre el formulario para crear un nuevo turno
     const handleOpenCreateTurno = () => {
-        setEditingTurno(null); // Asegura que el formulario esté vacío para un nuevo turno
+        setEditingTurno(null); 
         setIsTurnoFormOpen(true);
     };
 
@@ -155,23 +152,22 @@ export default function UserPanelPage() {
         try {
             let res;
             if (editingTurno) {
-                // Actualizar turno existente
-                // Solo se puede modificar la descripción por el cliente
+               
                 res = await fetch(`${API_URL}/turnos/${editingTurno.id}`, {
                     method: "PATCH",
                     headers: {
                         "Content-Type": "application/json",
                         Authorization: `Bearer ${token}`,
                     },
-                    // Solo enviar los campos que el cliente puede modificar.
-                    // El backend se encargará de ignorar cambios a 'dueno', 'cliente', 'estado' si no está permitido
-                    // y de aplicar el cambio de 'fechaHora' si las 48h lo permiten.
+                    
                     body: JSON.stringify({
                         descripcion: turnoData.descripcion,
-                        fechaHora: turnoData.fechaHora, // Permitir cambio de fecha si canModifyTurno lo permite
+                        fechaHora: turnoData.fechaHora, 
                     }),
                 });
+
             } else {
+
                 // Crear nuevo turno
                 res = await fetch(`${API_URL}/turnos`, {
                     method: "POST",
@@ -181,9 +177,9 @@ export default function UserPanelPage() {
                     },
                     body: JSON.stringify({
                         ...turnoData,
-                        cliente: { id: user.id }, // El cliente es el usuario logueado
-                        dueno: { id: TATUADOR_ID }, // El dueño es el tatuador único y constante
-                        estado: "SOLICITADO", // Un nuevo turno siempre inicia como 'SOLICITADO'
+                        cliente: { id: user.id }, 
+                        dueno: { id: TATUADOR_ID }, 
+                        estado: "SOLICITADO", 
                     }),
                 });
             }
@@ -194,10 +190,10 @@ export default function UserPanelPage() {
             }
 
             toast.success(`Turno ${editingTurno ? 'actualizado' : 'creado'} exitosamente.`);
-            fetchUserTurns(user.id); // Recargar los turnos para reflejar los cambios
-            setIsTurnoFormOpen(false); // Cerrar el modal
+            fetchUserTurns(user.id);
+            setIsTurnoFormOpen(false); 
             
-        } catch (error) { // Especificar tipo 'any' para el error
+        } catch (error) { 
             toast.error("Error al ${editingTurno ? 'actualizar' : 'crear'} el turno.");
             console.error(error);
         }
@@ -207,8 +203,8 @@ export default function UserPanelPage() {
     const confirmDeleteTurno = async () => {
 
         if (!token || !user || !deletingTurnoId) {
-             toast.error("No estás autenticado o no hay un turno seleccionado para eliminar.");
-             return;
+            toast.error("No estás autenticado o no hay un turno seleccionado para eliminar.");
+            return;
         }
 
         try {
@@ -225,9 +221,9 @@ export default function UserPanelPage() {
             }
 
             toast.success("Turno eliminado exitosamente.");
-            fetchUserTurns(user.id); // Recargar los turnos
-            setDeletingTurnoId(null); // Limpiar el ID del turno a eliminar
-            setIsDeleteUserDialogOpen(false); // Asegurarse de que el diálogo correcto se cierre
+            fetchUserTurns(user.id); 
+            setDeletingTurnoId(null); 
+            setIsDeleteUserDialogOpen(false);
 
         } catch (error) {
             toast.error("Error al eliminar el turno");
@@ -235,8 +231,7 @@ export default function UserPanelPage() {
         }
     };
 
-    // Función para verificar si un turno se puede modificar (editar o eliminar)
-    // Debe tener al menos 48 horas de antelación
+    // Función para verificar si un turno se puede modificar (editar o eliminar) - debe tener al menos 48 horas de antelación
     const canModifyTurno = (fechaHora: string) => {
         const turnoDate = new Date(fechaHora);
         const now = new Date();
@@ -471,9 +466,9 @@ export default function UserPanelPage() {
                                                             variant="ghost"
                                                             size="icon"
                                                             onClick={(e) => {
-                                                                e.stopPropagation(); // Evita que se dispare el click de la card
-                                                                setDeletingTurnoId(turno.id); // Establece el turno a eliminar
-                                                                setIsDeleteUserDialogOpen(true); // Abre el diálogo de confirmación
+                                                                e.stopPropagation();
+                                                                setDeletingTurnoId(turno.id); 
+                                                                setIsDeleteUserDialogOpen(true); 
                                                             }}
                                                             className="text-gray-400 hover:text-red-400 cursor-pointer"
                                                             title="Eliminar Turno"
@@ -515,7 +510,7 @@ export default function UserPanelPage() {
             {/* Modal de Eliminar Turno */}
             <Dialog open={deletingTurnoId !== null && isDeleteUserDialogOpen} onOpenChange={(open) => {
                 setIsDeleteUserDialogOpen(open);
-                if (!open) setDeletingTurnoId(null); // Limpiar si se cierra el diálogo
+                if (!open) setDeletingTurnoId(null); 
             }}>
                 <DialogContent className="sm:max-w-[425px] bg-gray-900 border-gray-700 text-white">
                     <DialogHeader>

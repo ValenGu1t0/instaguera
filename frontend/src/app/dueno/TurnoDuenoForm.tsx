@@ -9,12 +9,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Turno, Usuario } from "@/types";
 import { toast } from "sonner";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon, Loader2, UserIcon } from "lucide-react"; // Importar UserIcon
+import { CalendarIcon, Loader2, UserIcon } from "lucide-react"; 
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { Calendar } from "@/components/ui/calendar";
 import { useAuthStore } from "@/store/auth";
-import { useRouter } from "next/navigation"; // Usar useRouter de next/navigation para Next.js 13+
+import { useRouter } from "next/navigation";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -27,46 +27,48 @@ interface TimePickerProps {
 
 // Generador de horarios entre 09:00 y 20:00 en saltos de 15 minutos
 const generateTimeOptions = () => {
-  const options: string[] = [];
-  for (let hour = 9; hour <= 20; hour++) {
-    for (const minutes of [0, 15, 30, 45]) {
-      if (hour === 20 && minutes > 0) break;
-      const h = hour.toString().padStart(2, "0");
-      const m = minutes.toString().padStart(2, "0");
-      options.push(`${h}:${m}`);
+
+    const options: string[] = [];
+
+    for (let hour = 9; hour <= 20; hour++) {
+        for (const minutes of [0, 15, 30, 45]) {
+        if (hour === 20 && minutes > 0) break;
+        const h = hour.toString().padStart(2, "0");
+        const m = minutes.toString().padStart(2, "0");
+        options.push(`${h}:${m}`);
+        }
     }
-  }
-  return options;
+    return options;
 };
 
 const timeOptions = generateTimeOptions();
 
 const TimePicker: React.FC<TimePickerProps> = ({ value, onChange, disabled }) => {
-  return (
-    <Select value={value} onValueChange={onChange} disabled={disabled}>
-      <SelectTrigger className="w-full bg-gray-800 border-gray-600 text-white">
-        <SelectValue placeholder="Selecciona una hora" />
-      </SelectTrigger>
-      <SelectContent className="bg-gray-800 border-gray-600 text-white max-h-60">
-        {timeOptions.map((t) => (
-          <SelectItem key={t} value={t}>
-            {t}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
-  );
+    return (
+        <Select value={value} onValueChange={onChange} disabled={disabled}>
+            <SelectTrigger className="w-full bg-gray-800 border-gray-600 text-white">
+                <SelectValue placeholder="Selecciona una hora" />
+            </SelectTrigger>
+            <SelectContent className="bg-gray-800 border-gray-600 text-white max-h-60">
+                {timeOptions.map((t) => (
+                <SelectItem key={t} value={t}>
+                    {t}
+                </SelectItem>
+                ))}
+            </SelectContent>
+        </Select>
+    );
 };
 
 interface TurnoDuenoFormProps {
-  initialData?: Turno | null;
-  onSubmitSuccess: (turnoData: Partial<Turno>) => void;
-  onClose: () => void;
+    initialData?: Turno | null;
+    onSubmitSuccess: (turnoData: Partial<Turno>) => void;
+    onClose: () => void;
 }
 
 export default function TurnoDuenoForm({ initialData, onSubmitSuccess, onClose }: TurnoDuenoFormProps) {
-    const router = useRouter(); // Inicializar useRouter
 
+    const router = useRouter(); 
     const { token } = useAuthStore();
     const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
     const [selectedTime, setSelectedTime] = useState<string>("");
@@ -78,7 +80,7 @@ export default function TurnoDuenoForm({ initialData, onSubmitSuccess, onClose }
     const [loadingClientes, setLoadingClientes] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedClient, setSelectedClient] = useState<Usuario | null>(null);
-    const [isClientPopoverOpen, setIsClientPopoverOpen] = useState(false); // Nuevo estado para controlar la apertura del popover
+    const [isClientPopoverOpen, setIsClientPopoverOpen] = useState(false); 
 
     useEffect(() => {
         if (initialData) {
@@ -103,12 +105,13 @@ export default function TurnoDuenoForm({ initialData, onSubmitSuccess, onClose }
     }, [initialData]);
 
     const fetchAllClients = useCallback(async () => {
+
         if (!token) {
             setLoadingClientes(false);
             return;
         }
-
         setLoadingClientes(true);
+
         try {
             const res = await fetch(`${API_URL}/usuarios/clientes`, {
                 headers: {
@@ -127,12 +130,12 @@ export default function TurnoDuenoForm({ initialData, onSubmitSuccess, onClose }
 
             const clients: Usuario[] = await res.json();
             setClientes(clients);
-            // console.log(clients) // Deja esto para depuración si lo necesitas
 
         } catch (error) {
             toast.error("Hubo un error al cargar los clientes.");
             console.error("Error fetching clients:", error);
             setClientes([]);
+
         } finally {
             setLoadingClientes(false);
         }
@@ -152,6 +155,7 @@ export default function TurnoDuenoForm({ initialData, onSubmitSuccess, onClose }
         : clientes;
 
     const handleSubmit = (e: React.FormEvent) => {
+
         e.preventDefault();
 
         if (!selectedDate || !selectedTime || !descripcion) {
@@ -178,7 +182,8 @@ export default function TurnoDuenoForm({ initialData, onSubmitSuccess, onClose }
 
     return (
         <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Campo de selección de cliente */}
+
+            {/* Input de selección de cliente */}
             <div className="grid gap-2">
                 <Label htmlFor="clienteSelect" className="text-gray-300">
                     Cliente
@@ -248,7 +253,7 @@ export default function TurnoDuenoForm({ initialData, onSubmitSuccess, onClose }
                 </Popover>
             </div>
 
-
+            {/* Fecha - Calendario */}
             <div className="grid gap-2">
                 <Label htmlFor="fecha" className="text-gray-300">
                     Fecha
@@ -281,6 +286,7 @@ export default function TurnoDuenoForm({ initialData, onSubmitSuccess, onClose }
                 </Popover>
             </div>
 
+            {/* Hora */}
             <div className="grid gap-2">
                 <Label htmlFor="hora" className="text-gray-300">
                     Hora
@@ -288,6 +294,7 @@ export default function TurnoDuenoForm({ initialData, onSubmitSuccess, onClose }
                 <TimePicker value={selectedTime} onChange={setSelectedTime} />
             </div>
 
+            {/* Descripción */}
             <div className="grid gap-2">
                 <Label htmlFor="descripcion" className="text-gray-300">
                     Descripción del Tatuaje
@@ -301,6 +308,8 @@ export default function TurnoDuenoForm({ initialData, onSubmitSuccess, onClose }
                     className="bg-gray-800 border-gray-600 text-white min-h-[80px]"
                 />
             </div>
+
+            {/* Estado del turno */}
             <div className="grid gap-2">
                 <Label htmlFor="estado" className="text-gray-300">
                     Estado del Turno
@@ -317,6 +326,8 @@ export default function TurnoDuenoForm({ initialData, onSubmitSuccess, onClose }
                     </SelectContent>
                 </Select>
             </div>
+
+            {/* Submit */}
             <div className="flex justify-end gap-2 pt-4">
                 <Button
                     type="button"

@@ -23,35 +23,39 @@ interface TimePickerProps {
 
 // Generador de horarios entre 09:00 y 20:00 en saltos de 15 minutos
 const generateTimeOptions = () => {
-  const options: string[] = [];
-  for (let hour = 9; hour <= 20; hour++) {
-    for (const minutes of [0, 15, 30, 45]) {
-      if (hour === 20 && minutes > 0) break; 
-      const h = hour.toString().padStart(2, "0");
-      const m = minutes.toString().padStart(2, "0");
-      options.push(`${h}:${m}`);
+
+    const options: string[] = [];
+
+    for (let hour = 9; hour <= 20; hour++) {
+
+        for (const minutes of [0, 15, 30, 45]) {
+
+            if (hour === 20 && minutes > 0) break; 
+            const h = hour.toString().padStart(2, "0");
+            const m = minutes.toString().padStart(2, "0");
+            options.push(`${h}:${m}`);
+        }
     }
-  }
-  return options;
+    return options;
 };
 
 const timeOptions = generateTimeOptions();
 
 const TimePicker: React.FC<TimePickerProps> = ({ value, onChange, disabled }) => {
-  return (
-    <Select value={value} onValueChange={onChange} disabled={disabled}>
-      <SelectTrigger className="w-full bg-gray-800 border-gray-600 text-white">
-        <SelectValue placeholder="Selecciona una hora" />
-      </SelectTrigger>
-      <SelectContent className="bg-gray-800 border-gray-600 text-white max-h-60">
-        {timeOptions.map((t) => (
-          <SelectItem key={t} value={t}>
-            {t}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
-  );
+    return (
+        <Select value={value} onValueChange={onChange} disabled={disabled}>
+            <SelectTrigger className="w-full bg-gray-800 border-gray-600 text-white">
+                <SelectValue placeholder="Selecciona una hora" />
+            </SelectTrigger>
+            <SelectContent className="bg-gray-800 border-gray-600 text-white max-h-60">
+                {timeOptions.map((t) => (
+                <SelectItem key={t} value={t}>
+                    {t}
+                </SelectItem>
+                ))}
+            </SelectContent>
+        </Select>
+    );
 };
 
 interface TurnoFormProps {
@@ -115,11 +119,11 @@ export default function TurnoForm({
         const currentFechaHoraISO = fullFechaHora.toISOString();
 
         if (currentFechaHoraISO !== initialFechaHoraISO) {
-            toast.error(
-            "No puedes modificar la fecha y hora de un turno con menos de 48 horas de antelación."
-            );
+
+            toast.error("No puedes modificar la fecha y hora de un turno con menos de 48 horas de antelación.");
             return;
-        }
+            
+            }
         }
 
         onSubmitSuccess({
