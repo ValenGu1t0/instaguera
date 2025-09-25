@@ -20,24 +20,58 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { UserRoundPen, Trash2, CalendarCheck, LogOut, Plus } from "lucide-react";
+import { UserRoundPen, Trash2, CalendarCheck, LogOut, Plus, Users } from "lucide-react";
 import Link from "next/link";
 import TurnoAdminForm from "./TurnoAdminForm";
-import { Turno } from "@/types"; 
+import { Turno } from "@/types";
+
+// Importar componentes de tabla de shadcn/ui
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 const TATUADOR_ID = 1;
+
+// Definir un tipo para el cliente, si no lo tienes ya en `types`
+interface Cliente {
+    id: number;
+    nombre: string;
+    apellido: string;
+    celular: string;
+    username: string;
+    email: string;
+    role: string;
+}
 
 export default function AdminPanelPage() {
 
     const router = useRouter();
     const { user, token, logout } = useAuthStore();
-    const [allTurns, setAllTurns] = useState<Turno[]>([]); 
+    const [allTurns, setAllTurns] = useState<Turno[]>([]);
     const [loadingTurns, setLoadingTurns] = useState(true);
-    const [isTurnoFormOpen, setIsTurnoFormOpen] = useState(false); 
-    const [editingTurno, setEditingTurno] = useState<Turno | null>(null); 
+    const [isTurnoFormOpen, setIsTurnoFormOpen] = useState(false);
+    const [editingTurno, setEditingTurno] = useState<Turno | null>(null);
     const [deletingTurnoId, setDeletingTurnoId] = useState<number | null>(null);
-    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false); 
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
+    // NUEVOS ESTADOS para clientes
+    const [clientes, setClientes] = useState<Cliente[]>([]);
+    const [loadingClientes, setLoadingClientes] = useState(true);
+    const [deletingClientId, setDeletingClientId] = useState<number | null>(null);
+    const [isClientDeleteDialogOpen, setIsClientDeleteDialogOpen] = useState(false);
 
     // GET de TODOS los turnos para el admin
     const fetchAllTurns = useCallback(async () => {
@@ -59,7 +93,7 @@ export default function AdminPanelPage() {
             if (!res.ok) {
                 if (res.status === 403) {
                     toast.error("No tienes permisos para acceder a esta página.");
-                    router.push("/"); 
+                    router.push("/");
                     return;
                 }
                 throw new Error("Error al cargar los turnos.");
@@ -78,7 +112,43 @@ export default function AdminPanelPage() {
         }
     }, [token, router]);
 
-    // useEffect para la autenticación y carga de turnos
+    // NUEVA FUNCIÓN: GET de TODOS los clientes
+    const fetchAllClients = useCallback(async () => {
+        if (!token) {
+            setLoadingClientes(false);
+            return;
+        }
+
+        setLoadingClientes(true);
+        try {
+            const res = await fetch(`${API_URL}/usuarios/clientes`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            if (!res.ok) {
+                if (res.status === 403) {
+                    toast.error("No tienes permisos para ver los clientes.");
+                    // router.push("/"); // O puedes manejarlo de otra forma si no quieres redirigir
+                    return;
+                }
+                throw new Error("Error al cargar los clientes.");
+            }
+
+            const clients: Cliente[] = await res.json();
+            setClientes(clients);
+        } catch (error) {
+            toast.error("Hubo un error al cargar los clientes.");
+            console.error("Error fetching clients:", error);
+            setClientes([]);
+        } finally {
+            setLoadingClientes(false);
+        }
+    }, [token]);
+
+
+    // useEffect para la autenticación y carga de turnos Y CLIENTES
     useEffect(() => {
         if (typeof window !== "undefined") {
             if (!token) {
@@ -86,16 +156,17 @@ export default function AdminPanelPage() {
                 toast.error("Debes iniciar sesión para ver esta página.");
             } else if (user && (user.role === "ADMIN" || user.role === "DUENO")) { // Validar rol
                 fetchAllTurns();
+                fetchAllClients(); // LLAMADA PARA CARGAR CLIENTES
             } else if (user) { // Si hay usuario pero no tiene el rol correcto
                 toast.error("No tienes permisos para acceder a esta página.");
                 router.push("/"); // Redirigir a la página principal
             }
         }
-    }, [token, router, user, fetchAllTurns]);
+    }, [token, router, user, fetchAllTurns, fetchAllClients]); // Añadir fetchAllClients a las dependencias
 
     // Abre el formulario para crear un nuevo turno (si el admin lo necesita)
     const handleOpenCreateTurno = () => {
-        setEditingTurno(null); 
+        setEditingTurno(null);
         setIsTurnoFormOpen(true);
     };
 
@@ -148,7 +219,7 @@ export default function AdminPanelPage() {
                         dueno: { id: TATUADOR_ID }, // El dueño es el tatuador único y constante
                         estado: turnoData.estado || "SOLICITADO", // Puede definir el estado inicial
                         // Si el formulario de admin tuviera un selector de clientes, se agregaría aquí:
-                        // cliente: turnoData.cliente ? { id: turnoData.cliente.id } : null, 
+                        // cliente: turnoData.cliente ? { id: turnoData.cliente.id } : null,
                     }),
                 });
             }
@@ -160,8 +231,8 @@ export default function AdminPanelPage() {
 
             toast.success(`Turno ${editingTurno ? 'actualizado' : 'creado'} exitosamente.`);
             fetchAllTurns(); // Recargar TODOS los turnos
-            setIsTurnoFormOpen(false); 
-            
+            setIsTurnoFormOpen(false);
+
         } catch (error) {
             toast.error(`Error al ${editingTurno ? 'actualizar' : 'crear'} el turno!`);
             console.error(error);
@@ -189,12 +260,43 @@ export default function AdminPanelPage() {
             }
 
             toast.success("Turno eliminado exitosamente.");
-            fetchAllTurns(); 
-            setDeletingTurnoId(null); 
-            setIsDeleteDialogOpen(false); 
+            fetchAllTurns();
+            setDeletingTurnoId(null);
+            setIsDeleteDialogOpen(false);
 
         } catch (error) {
             toast.error(`Error al eliminar el turno!`);
+            console.error(error);
+        }
+    };
+
+    // NUEVA FUNCIÓN: DELETE Cliente
+    const confirmDeleteClient = async () => {
+        if (!token || !deletingClientId) {
+            toast.error("No estás autenticado o no hay un cliente seleccionado para eliminar.");
+            return;
+        }
+
+        try {
+            const res = await fetch(`${API_URL}/usuarios/${deletingClientId}`, {
+                method: "DELETE",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            if (!res.ok) {
+                const errorData = await res.json();
+                throw new Error(errorData.message || "Error al eliminar el cliente.");
+            }
+
+            toast.success("Cliente eliminado exitosamente.");
+            fetchAllClients(); // Recargar la lista de clientes
+            setDeletingClientId(null);
+            setIsClientDeleteDialogOpen(false);
+
+        } catch (error) {
+            toast.error(`Error al eliminar el cliente!`);
             console.error(error);
         }
     };
@@ -203,7 +305,7 @@ export default function AdminPanelPage() {
     const handleLogout = () => {
         toast.error("Sesión de administrador cerrada!");
         router.push("/");
-        logout(); 
+        logout();
     };
 
     if (!user || (!["ADMIN", "DUENO"].includes(user.role))) {
@@ -214,22 +316,22 @@ export default function AdminPanelPage() {
             </div>
         );
     }
-    
+
     return (
         <div className="flex min-h-screen flex-col items-center bg-gradient-to-br from-gray-900 to-black text-white">
 
             <header className="w-full px-8 py-6 bg-gray-700 flex flex-row justify-between items-center">
-                
+
                 <Link href="/"><h2 className="text-2xl text-white hover:text-indigo-400 transition">Inicio</h2></Link>
 
-                <h3 className="text-3xl text-white ">Panel Tatuador</h3>
+                <h3 className="text-3xl text-white ">Panel Administrador</h3>
 
                 <Button
                     variant="ghost"
-                    size="icon" 
+                    size="icon"
                     onClick={handleLogout}
                     className="text-white hover:bg-white/20 hover:text-red-400 cursor-pointer"
-                    title="Cerrar Sesión" 
+                    title="Cerrar Sesión"
                 >
                     <LogOut className="h-7 w-7" />
                 </Button>
@@ -239,7 +341,7 @@ export default function AdminPanelPage() {
             <div className="w-full my-8 max-w-[95%] px-8">
 
                 <Card className="bg-opacity-10 bg-gray-700 backdrop-filter backdrop-blur-lg border-2 border-indigo-600 text-white shadow-2xl">
-                    
+
                     <CardHeader>
                         <CardTitle className="text-2xl font-bold text-gray-100 flex items-center gap-2">
                             <CalendarCheck className="h-6 w-6 text-green-400" /> Gestión de Turnos
@@ -304,7 +406,7 @@ export default function AdminPanelPage() {
                                                     variant="ghost"
                                                     size="icon"
                                                     onClick={(e) => {
-                                                        e.stopPropagation(); 
+                                                        e.stopPropagation();
                                                         handleOpenEditTurno(turno);
                                                     }}
                                                     className="text-gray-400 hover:text-indigo-400 cursor-pointer"
@@ -316,9 +418,9 @@ export default function AdminPanelPage() {
                                                     variant="ghost"
                                                     size="icon"
                                                     onClick={(e) => {
-                                                        e.stopPropagation(); 
-                                                        setDeletingTurnoId(turno.id); 
-                                                        setIsDeleteDialogOpen(true); 
+                                                        e.stopPropagation();
+                                                        setDeletingTurnoId(turno.id);
+                                                        setIsDeleteDialogOpen(true);
                                                     }}
                                                     className="text-gray-400 hover:text-red-400 cursor-pointer"
                                                     title="Eliminar Turno"
@@ -331,10 +433,88 @@ export default function AdminPanelPage() {
                                 )}
                             </div>
                         )}
-                    
+
                     </CardContent>
                 </Card>
 
+            </div>
+
+            {/* Panel de Gestión de Clientes */}
+            <div className="w-full my-8 max-w-[95%] px-8">
+                <Card className="bg-opacity-10 bg-gray-700 backdrop-filter backdrop-blur-lg border-2 border-purple-600 text-white shadow-2xl">
+                    <CardHeader>
+                        <CardTitle className="text-2xl font-bold text-gray-100 flex items-center gap-2">
+                            <Users className="h-6 w-6 text-purple-400" /> Gestión de Clientes
+                        </CardTitle>
+                        <CardDescription className="text-gray-300">
+                            Administra todos los clientes de la aplicación.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        {loadingClientes ? (
+                            <p className="text-gray-400">Cargando clientes...</p>
+                        ) : (
+                            <div className="overflow-x-auto"> {/* Para desplazamiento en pantallas pequeñas */}
+                                {clientes.length === 0 ? (
+                                    <p className="text-gray-400">No hay clientes registrados.</p>
+                                ) : (
+                                    <Table>
+                                        <TableHeader>
+                                            <TableRow className="bg-gray-800 hover:bg-gray-700">
+                                                <TableHead className="text-purple-300">ID</TableHead>
+                                                <TableHead className="text-purple-300">Nombre</TableHead>
+                                                <TableHead className="text-purple-300">Apellido</TableHead>
+                                                <TableHead className="text-purple-300">Email</TableHead>
+                                                <TableHead className="text-purple-300">Celular</TableHead>
+                                                <TableHead className="text-purple-300">Acciones</TableHead>
+                                            </TableRow>
+                                        </TableHeader>
+                                        <TableBody>
+                                            {clientes.map((cliente) => (
+                                                <TableRow key={cliente.id} className="border-gray-700 hover:bg-gray-800">
+                                                    <TableCell className="font-medium text-gray-100">{cliente.id}</TableCell>
+                                                    <TableCell className="text-gray-200">{cliente.nombre}</TableCell>
+                                                    <TableCell className="text-gray-200">{cliente.apellido}</TableCell>
+                                                    <TableCell className="text-gray-200">{cliente.email}</TableCell>
+                                                    <TableCell className="text-gray-200">{cliente.celular}</TableCell>
+                                                    <TableCell>
+                                                        <DropdownMenu>
+                                                            <DropdownMenuTrigger asChild>
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    className="h-8 w-8 p-0 text-gray-400 hover:text-purple-400"
+                                                                >
+                                                                    <span className="sr-only">Abrir menú</span>
+                                                                    <Users className="h-4 w-4" /> {/* Icono de menú (puedes usar MoreHorizontal u otros) */}
+                                                                </Button>
+                                                            </DropdownMenuTrigger>
+                                                            <DropdownMenuContent align="end" className="bg-gray-800 border-gray-700 text-white">
+                                                                {/* <DropdownMenuItem className="hover:bg-gray-700 cursor-pointer">
+                                                                    <UserRoundPen className="mr-2 h-4 w-4" />
+                                                                    <span>Editar</span>
+                                                                </DropdownMenuItem> */}
+                                                                <DropdownMenuItem
+                                                                    onClick={() => {
+                                                                        setDeletingClientId(cliente.id);
+                                                                        setIsClientDeleteDialogOpen(true);
+                                                                    }}
+                                                                    className="text-red-400 hover:bg-gray-700 hover:text-red-300 cursor-pointer"
+                                                                >
+                                                                    <Trash2 className="mr-2 h-4 w-4" />
+                                                                    <span>Eliminar</span>
+                                                                </DropdownMenuItem>
+                                                            </DropdownMenuContent>
+                                                        </DropdownMenu>
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))}
+                                        </TableBody>
+                                    </Table>
+                                )}
+                            </div>
+                        )}
+                    </CardContent>
+                </Card>
             </div>
 
             {/* Modal para Crear/Editar Turno (Admin) */}
@@ -358,7 +538,7 @@ export default function AdminPanelPage() {
             {/* Modal de Eliminar Turno (Admin) */}
             <Dialog open={deletingTurnoId !== null && isDeleteDialogOpen} onOpenChange={(open) => {
                 setIsDeleteDialogOpen(open);
-                if (!open) setDeletingTurnoId(null); 
+                if (!open) setDeletingTurnoId(null);
             }}>
                 <DialogContent className="sm:max-w-[425px] bg-gray-900 border-gray-700 text-white">
                     <DialogHeader>
@@ -384,6 +564,40 @@ export default function AdminPanelPage() {
                             className="bg-red-600 hover:bg-red-700 text-white cursor-pointer"
                         >
                             Sí, Eliminar
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* Modal de Eliminar Cliente */}
+            <Dialog open={deletingClientId !== null && isClientDeleteDialogOpen} onOpenChange={(open) => {
+                setIsClientDeleteDialogOpen(open);
+                if (!open) setDeletingClientId(null);
+            }}>
+                <DialogContent className="sm:max-w-[425px] bg-gray-900 border-gray-700 text-white">
+                    <DialogHeader>
+                        <DialogTitle className="text-red-400">Confirmar Eliminación de Cliente</DialogTitle>
+                        <DialogDescription className="text-gray-400">
+                            ¿Estás seguro de que quieres eliminar este cliente? Esto también eliminará todos sus datos y turnos asociados. Esta acción no se puede deshacer.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                        <Button
+                            variant="outline"
+                            onClick={() => {
+                                setIsClientDeleteDialogOpen(false);
+                                setDeletingClientId(null);
+                            }}
+                            className="text-white hover:bg-gray-700 cursor-pointer"
+                        >
+                            Cancelar
+                        </Button>
+                        <Button
+                            variant="destructive"
+                            onClick={confirmDeleteClient}
+                            className="bg-red-600 hover:bg-red-700 text-white cursor-pointer"
+                        >
+                            Sí, Eliminar Cliente
                         </Button>
                     </DialogFooter>
                 </DialogContent>
