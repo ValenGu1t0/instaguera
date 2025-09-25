@@ -13,7 +13,6 @@ const images = [
   "/tattoos/tattoo6.jpg",
   "/tattoos/tattoo7.jpg",
   "/tattoos/tattoo8.jpg",
-  "/tattoos/tattoo9.jpg",
   "/tattoos/tattoo10.jpg",
 ]
 
@@ -23,7 +22,7 @@ export default function GridTatuajes() {
     const [zoom, setZoom] = useState(false)
 
     return (
-        <section className="py-16 bg-gray-900">
+        <section id="tattoos" className="py-16 bg-gray-900">
             <div className="max-w-6xl mx-auto px-4">
                 <h2 className="text-3xl font-bold text-center text-white mb-12">
                     Trabajos recientes

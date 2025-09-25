@@ -71,19 +71,19 @@ export default function NavBar() {
       rounded-4xl transition-transform duration-300
       bg-gradient-to-r from-white/20 via-white/10 to-white/10
       backdrop-blur-xl shadow-lg border border-white/20
-      flex flex-row px-4 py-2 sm:px-8 sm:py-4 sm:justify-between md:w-1/2 md:gap-8
+      flex flex-row px-4 py-4 sm:px-8 sm:py-4 sm:justify-between md:w-1/2 md:gap-8 md:py-3
       ${visible ? "translate-y-0" : "-translate-y-32"}
       items-center`}
     >
       {/* Logo */}
-      <Link href="/" className="text-xl font-semibold italic text-white hidden lg:flex">
+      <Link href="/" className="hidden lg:flex font-great-vibes text-2xl text-white ">
         Instaguera
       </Link>
 
       {/* Links */}
       <ul className="w-full flex items-center justify-evenly gap-4 sm:gap-6 font-semibold text-white">
-        <li><Link href="#inicio" className="hover:text-indigo-500 transition text-sm sm:text-lg">Inicio</Link></li>
-        <li><Link href="#tattoos" className="hover:text-indigo-500 transition text-sm sm:text-lg">Tattoos</Link></li>
+        <li><a href="#inicio" className="hover:text-indigo-500 transition text-sm sm:text-lg">Inicio</a></li>
+        <li><a href="#tattoos" className="hover:text-indigo-500 transition text-sm sm:text-lg">Tattoos</a></li>
         <li><Link href={turnosHref} className="hover:text-indigo-500 transition text-sm sm:text-lg">{turnosLabel}</Link></li>
       </ul>
 

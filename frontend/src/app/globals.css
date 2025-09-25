@@ -24,8 +24,25 @@
   }
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
-  scroll-behavior: smooth;
+}
+
+.mask-ink-splash {
+  /* Para Safari / Chrome */
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 500 500'><path d='M250,20 C370,0 500,100 480,250 C470,380 360,480 250,480 C120,480 20,370 20,250 C0,120 130,40 250,20Z' fill='black'/></svg>");
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  -webkit-mask-size: contain;
+
+  /* Estándar */
+  mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 500 500'><path d='M250,20 C370,0 500,100 480,250 C470,380 360,480 250,480 C120,480 20,370 20,250 C0,120 130,40 250,20Z' fill='black'/></svg>");
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
 }
