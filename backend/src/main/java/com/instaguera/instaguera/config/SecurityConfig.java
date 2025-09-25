@@ -26,6 +26,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
+                // stateless, osea solo con token y sin sesion
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> {})
                 // Autorizamos los distintos endpoint desde acá

@@ -39,23 +39,26 @@ public class AuthController {
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
         );
 
-        // Generar token
+        // Generamos token para la sesion
         String token = jwtUtil.generateToken(authentication.getName());
 
-        // Buscar el usuario
+        // Buscamos el usuario a loguear...
         Usuario usuario = usuarioRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        // Devolver { token, user }
+        // Si se da, devolvemos user y token que guardaremos en local en el front
         return new AuthResponse(token, usuario);
     }
 
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody RegisterRequest request) {
+
+        // Primero chequeamos que no exista un mail igual ya
         if (usuarioRepository.findByEmail(request.getEmail()).isPresent()) {
             return ResponseEntity.badRequest().body("El email ya está registrado");
         }
 
+        // Creamos el user, y encriptamos la contraseña
         Usuario nuevo = new Usuario(
                 request.getNombre(),
                 request.getApellido(),

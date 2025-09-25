@@ -23,7 +23,7 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
 
         return User.builder()
-                .username(usuario.getEmail())     // el email es el identificador para login
+                .username(usuario.getEmail())     // el email es el identificador para login !!!
                 .password(usuario.getPassword())
                 .roles(usuario.getRole().name())
                 .build();

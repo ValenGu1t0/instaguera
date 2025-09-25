@@ -3,7 +3,6 @@ package com.instaguera.instaguera.security;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Component;
-
 import java.security.Key;
 import java.util.Date;
 
@@ -11,11 +10,11 @@ import java.util.Date;
 public class JwtUtil {
 
     private final String SECRET_KEY = "claveSuperSecretaDeInstagueraQueDebeSerLarga123456";
-    private final long EXPIRATION_TIME = 1000 * 60 * 60; // 1 hora
+    private final long EXPIRATION_TIME = 1000 * 60 * 60;  // 1 horita ponele
 
     private final Key key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
 
-    // Generar token
+    // Genera el token
     public String generateToken(String username) {
         return Jwts.builder()
                 .setSubject(username)
@@ -25,7 +24,7 @@ public class JwtUtil {
                 .compact();
     }
 
-    // Extraer username
+    // Extrae el username
     public String extractUsername(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(key)
@@ -35,7 +34,7 @@ public class JwtUtil {
                 .getSubject();
     }
 
-    // Validar token
+    // Validamos token
     public boolean validateToken(String token, String username) {
         return username.equals(extractUsername(token)) && !isTokenExpired(token);
     }

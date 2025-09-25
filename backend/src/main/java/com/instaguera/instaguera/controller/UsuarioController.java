@@ -6,7 +6,6 @@ import com.instaguera.instaguera.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
@@ -16,25 +15,25 @@ public class UsuarioController {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
-    // GET - Listar TODOS los usuarios - nunca lo usaré
+    // GET - TODOS los usuarios - sin uso
     @GetMapping
     public List<Usuario> getAllUsuarios() {
         return usuarioRepository.findAll();
     }
 
-    // GET Clientes - este si
+    // GET Clientes
     @GetMapping("/clientes")
     public List<Usuario> getClientes() {
         return usuarioRepository.findByRole(Role.CLIENTE);
     }
 
-    // POST - Crear un nuevo usuario
+    // POST - Nuevo usuario
     @PostMapping
     public Usuario createUsuario(@RequestBody Usuario usuario) {
         return usuarioRepository.save(usuario);
     }
 
-    // PATCH - Actualizar datos de un usuario
+    // PATCH - Usuario
     @PatchMapping("/{id}")
     public ResponseEntity<Usuario> updateUsuario(@PathVariable Long id, @RequestBody Usuario cambios) {
         return usuarioRepository.findById(id)
@@ -51,7 +50,7 @@ public class UsuarioController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // DELETE - Eliminar un usuario
+    // DELETE - Usuario
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteUsuario(@PathVariable Long id) {
         if (!usuarioRepository.existsById(id)) {

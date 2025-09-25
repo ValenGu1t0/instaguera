@@ -5,7 +5,6 @@ import com.instaguera.instaguera.repository.TurnoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -16,13 +15,13 @@ public class TurnoController {
     @Autowired
     private TurnoRepository turnoRepository;
 
-    // GET - Listar todos los turnos
+    // GET - TODOS los turnos
     @GetMapping
     public List<Turno> getAllTurnos() {
         return turnoRepository.findAll();
     }
 
-    // GET - Buscar un turno por ID
+    // GET - Turno por ID
     @GetMapping("/{id}")
     public ResponseEntity<Turno> getTurnoById(@PathVariable Long id) {
         Optional<Turno> turno = turnoRepository.findById(id);
@@ -30,13 +29,13 @@ public class TurnoController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // POST - Crear un nuevo turno
+    // POST - Turno
     @PostMapping
     public Turno createTurno(@RequestBody Turno turno) {
         return turnoRepository.save(turno);
     }
 
-    // PATCH - Actualizar un turno
+    // PATCH - Turno
     @PatchMapping("/{id}")
     public ResponseEntity<Turno> updateTurno(@PathVariable Long id, @RequestBody Turno turnoDetails) {
         return turnoRepository.findById(id)
@@ -53,7 +52,7 @@ public class TurnoController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // DELETE - Eliminar un turno
+    // DELETE - Turno
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTurno(@PathVariable Long id) {
         return turnoRepository.findById(id)
