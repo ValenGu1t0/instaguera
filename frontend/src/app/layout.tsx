@@ -33,7 +33,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es">
+    <html lang="es" data-scroll-behavior="smooth">
       <body className={`${montserrat.variable} ${roboto.variable} ${greatVibes.variable} antialiased`}>
         <main className="font-montserrat ">
           {children}

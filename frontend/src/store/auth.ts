@@ -10,7 +10,7 @@ interface AuthState {
 
 export const useAuthStore = create<AuthState>((set) => ({
 
-  // Guardamos token y user desde localStorage si existen
+  // Guardamos token y user desde localStorage
   token: typeof window !== "undefined" ? localStorage.getItem("token") : null,
   user:
     typeof window !== "undefined" && localStorage.getItem("user")

@@ -22,13 +22,13 @@ import {
 } from "@/components/ui/dialog";
 import { UserRoundPen, Trash2, CalendarCheck, LogOut, Plus } from "lucide-react";
 import Link from "next/link";
-import TurnoAdminForm from "./TurnoAdminForm";
+import TurnoAdminForm from "../admin/TurnoAdminForm";
 import { Turno } from "@/types"; 
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 const TATUADOR_ID = 1;
 
-export default function AdminPanelPage() {
+export default function DuenoPanelPage() {
 
     const router = useRouter();
     const { user, token, logout } = useAuthStore();
@@ -39,7 +39,7 @@ export default function AdminPanelPage() {
     const [deletingTurnoId, setDeletingTurnoId] = useState<number | null>(null);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false); 
 
-    // GET de TODOS los turnos para el admin
+    // GET de TODOS los turnos para el Dueño
     const fetchAllTurns = useCallback(async () => {
 
         if (!token) {
@@ -50,16 +50,16 @@ export default function AdminPanelPage() {
         setLoadingTurns(true);
 
         try {
-            const res = await fetch(`${API_URL}/turnos`, {
+            const res = await fetch(`${API_URL}/turnos`, { // Este endpoint debería devolver TODOS los turnos
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
             });
 
             if (!res.ok) {
-                if (res.status === 403) {
+                if (res.status === 403) { // Prohibido si no tiene rol de admin/dueno
                     toast.error("No tienes permisos para acceder a esta página.");
-                    router.push("/"); 
+                    router.push("/"); // Redirigir a la página principal
                     return;
                 }
                 throw new Error("Error al cargar los turnos.");
@@ -93,7 +93,7 @@ export default function AdminPanelPage() {
         }
     }, [token, router, user, fetchAllTurns]);
 
-    // Abre el formulario para crear un nuevo turno (si el admin lo necesita)
+    // Abre el formulario para crear un nuevo turno (si el dueño lo necesita)
     const handleOpenCreateTurno = () => {
         setEditingTurno(null); 
         setIsTurnoFormOpen(true);
@@ -105,7 +105,7 @@ export default function AdminPanelPage() {
         setIsTurnoFormOpen(true);
     };
 
-    // SUBMIT POST / PATCH Turnos (para el admin)
+    // SUBMIT POST / PATCH Turnos (para el dueño)
     const handleCreateUpdateTurno = async (turnoData: Partial<Turno>) => {
         if (!token || !user) {
             toast.error("No estás autenticado o no se pudo obtener tu información.");

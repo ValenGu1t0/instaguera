@@ -30,7 +30,7 @@ export default function Contacto() {
 
                 {/* Whatapp */}
                 <a
-                    href="https://wa.me/5493416671140"
+                    href="https://wa.me/5493416671140/?text=Hola%20Thiago!%20Quisiera%20cotizar%20mi%20tatuaje!"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-3 text-gray-200 hover:text-green-500 transition"
