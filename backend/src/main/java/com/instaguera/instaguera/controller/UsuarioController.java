@@ -1,5 +1,6 @@
 package com.instaguera.instaguera.controller;
 
+import com.instaguera.instaguera.model.Role;
 import com.instaguera.instaguera.model.Usuario;
 import com.instaguera.instaguera.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,10 +16,16 @@ public class UsuarioController {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
-    // GET - Listar todos los usuarios
+    // GET - Listar TODOS los usuarios - nunca lo usaré
     @GetMapping
     public List<Usuario> getAllUsuarios() {
         return usuarioRepository.findAll();
+    }
+
+    // GET Clientes - este si
+    @GetMapping("/clientes")
+    public List<Usuario> getClientes() {
+        return usuarioRepository.findByRole(Role.CLIENTE);
     }
 
     // POST - Crear un nuevo usuario
@@ -27,7 +34,7 @@ public class UsuarioController {
         return usuarioRepository.save(usuario);
     }
 
-    // PATCH - Actualizar parcialmente un usuario
+    // PATCH - Actualizar datos de un usuario
     @PatchMapping("/{id}")
     public ResponseEntity<Usuario> updateUsuario(@PathVariable Long id, @RequestBody Usuario cambios) {
         return usuarioRepository.findById(id)
