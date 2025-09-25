@@ -22,8 +22,8 @@ import {
 } from "@/components/ui/dialog";
 import { UserRoundPen, Trash2, CalendarCheck, LogOut, Plus } from "lucide-react";
 import Link from "next/link";
-import TurnoAdminForm from "../admin/TurnoAdminForm";
 import { Turno } from "@/types"; 
+import TurnoDuenoForm from "./TurnoDuenoForm";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 const TATUADOR_ID = 1;
@@ -80,15 +80,19 @@ export default function DuenoPanelPage() {
 
     // useEffect para la autenticación y carga de turnos
     useEffect(() => {
+
         if (typeof window !== "undefined") {
+
             if (!token) {
                 router.push("/login");
-                toast.error("Debes iniciar sesión para ver esta página.");
-            } else if (user && (user.role === "ADMIN" || user.role === "DUENO")) { // Validar rol
+                
+            } else if (user && (user.role === "DUENO")) { // Validar rol
+
                 fetchAllTurns();
-            } else if (user) { // Si hay usuario pero no tiene el rol correcto
+
+            } else if (user) { 
                 toast.error("No tienes permisos para acceder a esta página.");
-                router.push("/"); // Redirigir a la página principal
+                router.push("/"); 
             }
         }
     }, [token, router, user, fetchAllTurns]);
@@ -105,7 +109,7 @@ export default function DuenoPanelPage() {
         setIsTurnoFormOpen(true);
     };
 
-    // SUBMIT POST / PATCH Turnos (para el dueño)
+    // SUBMIT POST / PATCH Turnos 
     const handleCreateUpdateTurno = async (turnoData: Partial<Turno>) => {
         if (!token || !user) {
             toast.error("No estás autenticado o no se pudo obtener tu información.");
@@ -201,13 +205,12 @@ export default function DuenoPanelPage() {
 
     // Logout desde panel de admin
     const handleLogout = () => {
-        toast.error("Sesión de administrador cerrada!");
+        toast.error("Sesión de dueño cerrada!");
         router.push("/");
         logout(); 
     };
 
     if (!user || (!["ADMIN", "DUENO"].includes(user.role))) {
-        // Redirigir si no hay usuario o no tiene el rol adecuado
         return (
             <div className="flex justify-center items-center h-screen text-2xl bg-gradient-to-br from-gray-900 to-black text-white">
                 Verificando permisos...
@@ -337,7 +340,7 @@ export default function DuenoPanelPage() {
 
             </div>
 
-            {/* Modal para Crear/Editar Turno (Admin) */}
+            {/* Modal para Crear/Editar Turno */}
             <Dialog open={isTurnoFormOpen} onOpenChange={setIsTurnoFormOpen}>
                 <DialogContent className="sm:max-w-[425px] bg-gray-900 border-gray-700 text-white">
                     <DialogHeader>
@@ -346,16 +349,15 @@ export default function DuenoPanelPage() {
                             Gestiona los detalles del turno.
                         </DialogDescription>
                     </DialogHeader>
-                    <TurnoAdminForm
+                    <TurnoDuenoForm
                         initialData={editingTurno}
                         onSubmitSuccess={handleCreateUpdateTurno}
                         onClose={() => setIsTurnoFormOpen(false)}
-                        // Aquí no necesitamos pasar 'canModifyTurno' porque el admin puede modificar todo
                     />
                 </DialogContent>
             </Dialog>
 
-            {/* Modal de Eliminar Turno (Admin) */}
+            {/* Modal de Eliminar Turno */}
             <Dialog open={deletingTurnoId !== null && isDeleteDialogOpen} onOpenChange={(open) => {
                 setIsDeleteDialogOpen(open);
                 if (!open) setDeletingTurnoId(null); 

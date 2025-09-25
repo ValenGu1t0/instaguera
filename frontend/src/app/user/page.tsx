@@ -82,14 +82,17 @@ export default function UserPanelPage() {
 
     // useEffect para la autenticación y carga de turnos
     useEffect(() => {
+
         if (typeof window !== "undefined") {
             if (!token) {
+
                 router.push("/login");
-                toast.error("Debes iniciar sesión para ver esta página.");
-            } else if (user && user.id) { // Asegúrate de que user y user.id existen
+
+            } else if (user && user.id) { 
                 fetchUserTurns(user.id);
             }
         }
+
     }, [token, router, user, fetchUserTurns]); // fetchUserTurns como dependencia
 
 
@@ -259,6 +262,7 @@ export default function UserPanelPage() {
     return (
         <div className="flex min-h-screen flex-col items-center bg-gradient-to-br from-gray-900 to-black text-white">
 
+            {/* NavBar Panel */}
             <header className="w-full px-8 py-6 bg-gray-700 flex flex-row justify-between items-center">
                 
                 <Link href="/"><h2 className="text-2xl text-white hover:text-indigo-400 transition">Inicio</h2></Link>
@@ -277,9 +281,9 @@ export default function UserPanelPage() {
             </header>
 
             {/* Cards del Usuario */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full max-w-4/5 px-8 mt-8"> {/* Ajuste de max-w y px */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full max-w-[90%] px-8 mt-8"> {/* Ajuste de max-w y px */}
 
-                {/* Información de Usuario (EXISTENTE) */}
+                {/* Información de Usuario */}
                 <Card className="bg-opacity-10 bg-gray-600 backdrop-filter backdrop-blur-lg border border-indigo-700 text-white shadow-lg">
                     <CardHeader>
                         <CardTitle className="text-2xl font-bold text-gray-100 flex items-center gap-2">
@@ -383,7 +387,7 @@ export default function UserPanelPage() {
             </div>
 
             {/* Turnos del Usuario */}
-            <div className="w-full my-8 max-w-4/5 px-8">
+            <div className="w-full my-8 max-w-[90%] px-8">
 
                 {/* Card de Turno */}
                 <Card className="bg-opacity-10 bg-gray-600 backdrop-filter backdrop-blur-lg border-2 border-indigo-700 text-white shadow-2xl">

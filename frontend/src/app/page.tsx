@@ -9,6 +9,7 @@ export default function Home() {
   return (
 
     <div className="min-h-screen font-montserrat">
+      
       <div id="inicio"></div>
 
       <NavBar />
@@ -18,8 +19,6 @@ export default function Home() {
       <GridTatuajes />
 
       <Contacto />
-
-      {/* <Footer /> */}
 
     </div>
   );

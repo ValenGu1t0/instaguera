@@ -9,7 +9,7 @@ export default function Contacto() {
         {/* Columna izquierda - Redes */}
         <div className="w-full md:w-1/2 flex flex-col items-center md:items-start gap-6">
             
-            <h2 className="text-3xl font-bold text-white">Contactemos!</h2>
+            <h2 className="text-3xl font-bold text-white">Reserva tu turno!</h2>
             
             <p className="text-gray-300">
                 Podés hablarme directamente por mis redes o apps de mensajería.
@@ -58,7 +58,7 @@ export default function Contacto() {
                 ¿Listo para tu próximo tatuaje?
             </h3>
             <p className="text-gray-300 max-w-md md:ml-auto">
-                Creá tu cuenta y reservá un turno online. Es rápido y fácil para que no tengas que esperar.
+                Creá tu cuenta y <strong>reservá un turno online</strong>. Es rápido y fácil para que no tengas que esperar.
             </p>
             <Link href="/register" className="bg-indigo-500 hover:bg-gray-200 text-indigo-950 font-semibold px-4 py-3 md:px-8 md:py-3 rounded-2xl shadow-md hover:scale-105 transition cursor-pointer">
                 Crear cuenta y sacar turno

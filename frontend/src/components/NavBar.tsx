@@ -21,8 +21,12 @@ export default function NavBar() {
   let turnosLabel = "Turnos";
 
   if (token) {
-    if (user?.role === "ADMIN"  || user?.role === "DUENO") {
+    if (user?.role === "ADMIN") {
       turnosHref = "/admin";
+      turnosLabel = "Gestión";
+
+    } else if (user?.role === "DUENO") {
+      turnosHref = "/dueno";
       turnosLabel = "Gestión";
 
     } else if (user?.role === "CLIENTE") {
@@ -75,10 +79,10 @@ export default function NavBar() {
       ${visible ? "translate-y-0" : "-translate-y-32"}
       items-center`}
     >
-      {/* Logo */}
-      <Link href="/" className="hidden lg:flex font-great-vibes text-2xl text-white ">
+      {/* Logo Titulo de la pagina */}
+      <h2 className="hidden lg:flex font-great-vibes text-2xl text-white">
         Instaguera
-      </Link>
+      </h2>
 
       {/* Links */}
       <ul className="w-full flex items-center justify-evenly gap-4 sm:gap-6 font-semibold text-white">
