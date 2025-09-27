@@ -120,6 +120,7 @@ export default function UserPanelPage() {
             toast.success("Tu cuenta ha sido eliminada. ¡Gracias por ser parte!");
             logout();
             router.push("/");
+            
         } catch (err) {
             toast.error("Error al eliminar tu cuenta.");
             console.error(err);

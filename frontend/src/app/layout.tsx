@@ -35,7 +35,7 @@ export default function RootLayout({
   return (
     <html lang="es" data-scroll-behavior="smooth">
       <body className={`${montserrat.variable} ${roboto.variable} ${greatVibes.variable} antialiased`}>
-        <main className="font-montserrat ">
+        <main className="font-montserrat">
           {children}
           <Toaster richColors position="bottom-right" />
         </main>

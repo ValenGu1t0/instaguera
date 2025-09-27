@@ -7,7 +7,7 @@ export default function Hero() {
     <section className="flex flex-col md:flex-row items-center justify-between min-h-screen px-12 md:px-16 bg-gradient-to-br from-gray-800 to-black">
       
       {/* Columna izquierda: Texto */}
-      <div className="w-full md:w-1/2 text-center md:text-left space-y-6 mt-32">
+      <div className="w-full md:w-1/2 text-center md:text-left space-y-6 mt-36">
         
         <h1 className="text-5xl md:text-6xl font-extrabold text-white leading-tight">
           Thiago <span className="text-indigo-700">Reis</span>

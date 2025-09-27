@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
+import PageTransition from "@/components/PageTransition";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -63,149 +64,152 @@ export default function Register() {
     };    
 
     return (
-        <div className="flex flex-col justify-center items-center w-screen bg-gradient-to-br from-gray-900 to-black p-4">
 
-            <Card className="w-full my-16 max-w-lg bg-opacity-10 bg-gray-700 backdrop-filter backdrop-blur-lg border border-gray-700 text-white shadow-lg">
-                
-                <CardHeader className="text-center">
-                <CardTitle className="text-3xl font-bold text-white">Crear Cuenta</CardTitle>
-                <CardDescription className="text-white">
-                    Únete a nuestra comunidad. ¡Es rápido y fácil!
-                </CardDescription>
-                </CardHeader>
+        <PageTransition>
+            <div className="flex flex-col justify-center items-center w-screen bg-gradient-to-br from-gray-900 to-black p-4">
 
-                <CardContent>
-                    {/* Campos del Form */}
-                    <form onSubmit={handleSubmit} className="space-y-4">
+                <Card className="w-full my-16 max-w-lg bg-opacity-10 bg-gray-700 backdrop-filter backdrop-blur-lg border border-gray-700 text-white shadow-lg">
+                    
+                    <CardHeader className="text-center">
+                    <CardTitle className="text-3xl font-bold text-white">Crear Cuenta</CardTitle>
+                    <CardDescription className="text-white">
+                        Únete a nuestra comunidad. ¡Es rápido y fácil!
+                    </CardDescription>
+                    </CardHeader>
 
-                        {/* Nombre Apellido */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {/* Nombre */}
-                        <div>
-                            <Label htmlFor="nombre" className="text-indigo-100">
-                            Nombre
-                            </Label>
-                            <Input
-                            id="nombre"
-                            type="text"
-                            value={nombre}
-                            onChange={(e) => setNombre(e.target.value)}
-                            placeholder="Tu nombre"
-                            required
-                            className="mt-1 bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-violet-500 focus:ring-violet-500"
-                            />
-                        </div>
+                    <CardContent>
+                        {/* Campos del Form */}
+                        <form onSubmit={handleSubmit} className="space-y-4">
 
-                        {/* Apellido */}
-                        <div>
-                            <Label htmlFor="apellido" className="text-indigo-100">
-                            Apellido
-                            </Label>
-                            <Input
-                            id="apellido"
-                            type="text"
-                            value={apellido}
-                            onChange={(e) => setApellido(e.target.value)}
-                            placeholder="Tu apellido"
-                            required
-                            className="mt-1 bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-violet-500 focus:ring-violet-500"
-                            />
-                        </div>
-                        </div>
-
-                        {/* Username Celular */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {/* Username */}
+                            {/* Nombre Apellido */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {/* Nombre */}
                             <div>
-                            <Label htmlFor="username" className="text-indigo-100">
-                                Nombre de Usuario
-                            </Label>
-                            <Input
-                                id="username"
+                                <Label htmlFor="nombre" className="text-indigo-100">
+                                Nombre
+                                </Label>
+                                <Input
+                                id="nombre"
                                 type="text"
-                                value={username}
-                                onChange={(e) => setUsername(e.target.value)}
-                                placeholder="nombredeusuario"
+                                value={nombre}
+                                onChange={(e) => setNombre(e.target.value)}
+                                placeholder="Tu nombre"
                                 required
                                 className="mt-1 bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-violet-500 focus:ring-violet-500"
-                            />
+                                />
                             </div>
 
-                            {/* Celular */}
+                            {/* Apellido */}
                             <div>
-                            <Label htmlFor="celular" className="text-indigo-100">
-                                Celular
+                                <Label htmlFor="apellido" className="text-indigo-100">
+                                Apellido
+                                </Label>
+                                <Input
+                                id="apellido"
+                                type="text"
+                                value={apellido}
+                                onChange={(e) => setApellido(e.target.value)}
+                                placeholder="Tu apellido"
+                                required
+                                className="mt-1 bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-violet-500 focus:ring-violet-500"
+                                />
+                            </div>
+                            </div>
+
+                            {/* Username Celular */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {/* Username */}
+                                <div>
+                                <Label htmlFor="username" className="text-indigo-100">
+                                    Nombre de Usuario
+                                </Label>
+                                <Input
+                                    id="username"
+                                    type="text"
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value)}
+                                    placeholder="nombredeusuario"
+                                    required
+                                    className="mt-1 bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-violet-500 focus:ring-violet-500"
+                                />
+                                </div>
+
+                                {/* Celular */}
+                                <div>
+                                <Label htmlFor="celular" className="text-indigo-100">
+                                    Celular
+                                </Label>
+                                <Input
+                                    id="celular"
+                                    type="tel" // Tipo 'tel' para móviles
+                                    value={celular}
+                                    onChange={(e) => setCelular(e.target.value)}
+                                    placeholder="Ej: 3001234567"
+                                    required
+                                    className="mt-1 bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-violet-500 focus:ring-violet-500"
+                                />
+                                </div>
+                            </div>
+                            
+                            {/* Email */}
+                            <div>
+                            <Label htmlFor="email" className="text-indigo-100">
+                                Email
                             </Label>
                             <Input
-                                id="celular"
-                                type="tel" // Tipo 'tel' para móviles
-                                value={celular}
-                                onChange={(e) => setCelular(e.target.value)}
-                                placeholder="Ej: 3001234567"
+                                id="email"
+                                type="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                placeholder="tu@ejemplo.com"
                                 required
                                 className="mt-1 bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-violet-500 focus:ring-violet-500"
                             />
                             </div>
-                        </div>
-                        
-                        {/* Email */}
-                        <div>
-                        <Label htmlFor="email" className="text-indigo-100">
-                            Email
-                        </Label>
-                        <Input
-                            id="email"
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            placeholder="tu@ejemplo.com"
-                            required
-                            className="mt-1 bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-violet-500 focus:ring-violet-500"
-                        />
-                        </div>
 
-                        {/* Contraseña */}
-                        <div>
-                        <Label htmlFor="password" className="text-indigo-100">
-                            Contraseña
-                        </Label>
-                        <Input
-                            id="password"
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            placeholder="********"
-                            required
-                            className="mt-1 bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-violet-500 focus:ring-violet-500"
-                        />
-                        </div>
+                            {/* Contraseña */}
+                            <div>
+                            <Label htmlFor="password" className="text-indigo-100">
+                                Contraseña
+                            </Label>
+                            <Input
+                                id="password"
+                                type="password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                placeholder="********"
+                                required
+                                className="mt-1 bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-violet-500 focus:ring-violet-500"
+                            />
+                            </div>
 
-                        {error && (
-                        <p className="text-red-300 text-sm text-center" role="alert">
-                            {error}
+                            {error && (
+                            <p className="text-red-300 text-sm text-center" role="alert">
+                                {error}
+                            </p>
+                            )}
+
+                            {/* Submit */}
+                            <Button
+                            type="submit"
+                            className="w-full bg-indigo-700 hover:bg-indigo-900 cursor-pointer text-white font-semibold py-2 rounded-md transition-colors duration-300"
+                            disabled={loading}
+                            >
+                            {loading ? "Registrando..." : "Registrarse"}
+                            </Button>
+                        </form>
+
+                        {/* Login */}
+                        <p className="mt-4 text-center text-indigo-300 text-sm">
+                            ¿Ya tienes cuenta?{" "}
+                            <a href="/login" className="text-purple-400 hover:underline">
+                            Inicia Sesión
+                            </a>
                         </p>
-                        )}
+                    </CardContent>
+                </Card>
 
-                        {/* Submit */}
-                        <Button
-                        type="submit"
-                        className="w-full bg-indigo-700 hover:bg-indigo-900 cursor-pointer text-white font-semibold py-2 rounded-md transition-colors duration-300"
-                        disabled={loading}
-                        >
-                        {loading ? "Registrando..." : "Registrarse"}
-                        </Button>
-                    </form>
-
-                    {/* Login */}
-                    <p className="mt-4 text-center text-indigo-300 text-sm">
-                        ¿Ya tienes cuenta?{" "}
-                        <a href="/login" className="text-purple-400 hover:underline">
-                        Inicia Sesión
-                        </a>
-                    </p>
-                </CardContent>
-            </Card>
-
-        </div>
+            </div>
+        </PageTransition>
     );
 }
